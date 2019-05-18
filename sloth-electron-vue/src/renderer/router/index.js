@@ -4,6 +4,7 @@ import LandingPage from '@/components/LandingPage'
 import Home from '@/components/Tab/Home'
 import Sloth_mysql from '@/components/Tab/MySQL'
 import Header from '@/components/Shared/header.vue'
+import Footer from '@/components/Shared/footer.vue'
 
 Vue.use(Router)
 
@@ -14,7 +15,9 @@ export default new Router({
       name: 'home',
       components: {
         default: Home,
-        header: Header
+        header: Header,
+        footer: Footer
+
       }
     },
     {
@@ -22,7 +25,9 @@ export default new Router({
       name: 'tab-mysqll',
       components: {
         default: Sloth_mysql,
-        header: Header
+        header: Header,
+        footer: Footer
+
       }
     },
     {
