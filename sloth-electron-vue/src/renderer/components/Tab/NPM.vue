@@ -1,6 +1,6 @@
 <template>
   <div class="" style="height:88vh;">
-    <iframe src="http://52.79.250.191:3000" width="100%" height="100%"></iframe>
+    <iframe src="http://52.79.250.191:1337" width="100%" height="100%"></iframe>
   </div>
 </template>
 
