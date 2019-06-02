@@ -7,7 +7,7 @@
       </b-col>
       <b-col cols = "9">
         <b-link to="/"      class="btn btn-light" style="color: #70AE47; font-weight:700; margin-right:30px;">Home</b-link>
-        <b-link to="/"      class="btn btn-light" style="color: #70AE47; font-weight:700; margin-right:30px;">Server</b-link>
+        <b-link to="/server"      class="btn btn-light" style="color: #70AE47; font-weight:700; margin-right:30px;">Server</b-link>
         <b-link to="/mysql" class="btn btn-light" style="color: #70AE47; font-weight:700; margin-right:30px;">MySQL</b-link>
         <b-link to="/npm"      class="btn btn-light" style="color: #70AE47; font-weight:700; margin-right:30px;">npm</b-link>
         <b-link to="/"      class="btn btn-light" style="color: #70AE47; font-weight:700; margin-right:30px;">Design</b-link>

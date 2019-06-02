@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import LandingPage from '@/components/LandingPage'
 import Home from '@/components/Tab/Home'
-import Sloth_mysql from '@/components/Tab/MySQL'
-import Sloth_npm from '@/components/Tab/NPM'
+import Sloth_MySQL from '@/components/Tab/MySQL'
+import Sloth_NPM from '@/components/Tab/NPM'
+import Sloth_Server from '@/components/Tab/Server'
 import Header from '@/components/Shared/header.vue'
 import Footer from '@/components/Shared/footer.vue'
 
@@ -25,7 +25,7 @@ export default new Router({
       path: '/mysql',
       name: 'menu-mysqll',
       components: {
-        default: Sloth_mysql,
+        default: Sloth_MySQL,
         header: Header,
         footer: Footer
 
@@ -35,7 +35,17 @@ export default new Router({
       path: '/npm',
       name: 'menu-npm',
       components: {
-        default: Sloth_npm,
+        default: Sloth_NPM,
+        header: Header,
+        footer: Footer
+
+      }
+    },
+    {
+      path: '/server',
+      name: 'menu-server',
+      components: {
+        default: Sloth_Server,
         header: Header,
         footer: Footer
 

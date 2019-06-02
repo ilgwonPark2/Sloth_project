@@ -2,8 +2,6 @@ import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 
 Vue.use(BootstrapVue)
-// import { BLink } from 'bootstrap-vue/es/components'
-// Vue.component('b-link', BLink)
 
 import axios from 'axios'
 
@@ -21,6 +19,7 @@ Vue.config.productionTip = false
 // css files below...
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import '../../static/style/font-awesome.min.css'
 
 /* eslint-disable no-new */
 new Vue({

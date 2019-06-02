@@ -10,7 +10,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
-  ? `http://localhost:9080`
+  ? `http://localhost:9050`
   : `file://${__dirname}/index.html`
 
 function createWindow () {
@@ -43,6 +43,10 @@ app.on('activate', () => {
     createWindow()
   }
 })
+app.on('test', () => {
+  console.log("test");
+})
+
 
 /**
  * Auto Updater
