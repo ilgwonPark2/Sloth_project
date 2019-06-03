@@ -59,27 +59,27 @@ export default {
        },
        items: [
          {
-           server_control: true,
+           server_control: false,
            server: 'Node_server1',
-           port: '8080',
+           port: '2222',
            performance : { memory: '20.33MB', cpu: '2%', size:'200MB' }
          },
+         // {
+         //   server_control: false,
+         //   server: 'Node_server2',
+         //   port: '8080',
+         //   performance : { memory: '114.2MB', cpu: '9%', size:'970MB' }
+         // },
+         // {
+         //   server_control: true,
+         //   server: 'MySQL',
+         //   port: '8080',
+         //   performance : { memory: '10.31MB', cpu: '5%', size:'29MB' }
+         // },
          {
            server_control: false,
-           server: 'Node_server2',
-           port: '8080',
-           performance : { memory: '114.2MB', cpu: '9%', size:'970MB' }
-         },
-         {
-           server_control: true,
-           server: 'MySQL',
-           port: '8080',
-           performance : { memory: '10.31MB', cpu: '5%', size:'29MB' }
-         },
-         {
-           server_control: false,
-           server: 'NPM_GUI',
-           port: '8080',
+           server: 'ping',
+           port: '3333',
            performance : { memory: '122.33MB', cpu: '1.5%', size:'889MB' }
          }
        ]
@@ -87,19 +87,21 @@ export default {
    },
    mounted: function() {
      console.log("hello world");
-     ipcRenderer.on('asynchronous-reply', (event, arg) => {
-       console.log(arg) // prints "pong"
-     })
+     // ipcRenderer.on('asynchronous-reply', (event, arg) => {
+     //   console.log(arg) // prints "pong"
+     // })
    },
    methods: {
      toggle_server(item){
-       var index2 = this.find_elem(item);
-       // console.log(ipcRenderer.sendSync('synchronous-message', 'ping'))
-       // ipcRenderer.sendSync('server_start', item);
-
-       ipcRenderer.sendSync('server_stop', item)
-
-       this.items[index2].server_control = !this.items[index2].server_control;
+       console.log(item);
+       console.log(item.server);
+       var index = this.find_elem(item);
+       if(this.items[index].server_control){
+       ipcRenderer.send('server_stop', item.server);
+     } else{
+       ipcRenderer.send('server_start', item.server);
+     }
+       this.items[index].server_control = !this.items[index].server_control;
      },
      control_server(item){
      },
@@ -108,6 +110,7 @@ export default {
        this.items.forEach(function(item, index, arr){
          if(JSON.stringify(item_find) === JSON.stringify(item)) result = index;
        })
+       console.log(result);
      return result;
      }
    }

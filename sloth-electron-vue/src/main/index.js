@@ -54,6 +54,7 @@ ipcMain.on('server_start', (event, arg) => {
   const http = require('http')
   const app = express()
   const server = http.createServer(app);
+
   var jsonFile = require('../../static/node_server/test_config')
   const s_name = arg
   var index = 0
@@ -69,9 +70,10 @@ ipcMain.on('server_start', (event, arg) => {
   const io = require('socket.io')(server)
   io.on('connection', (socketServer) => {
     socketServer.on('serverStop', () => {
-      process.exit(0);
+      // process.exit(0);
+      server.close();
+      console.log('server is termniated');
     });
-    console.log('server is termniated');
   });
 })
 
@@ -79,8 +81,6 @@ ipcMain.on('server_stop', (event, arg) => {
   const io = require('socket.io-client');
   var jsonFile = require('../../static/node_server/test_config')
   const s_name = arg
-  var len = jsonFile.servers.length;
-
   var index = 0
   for (var i = 0; i < jsonFile.servers.length; i++) {
     if (jsonFile.servers[i].server_name == s_name) {
@@ -89,14 +89,15 @@ ipcMain.on('server_stop', (event, arg) => {
     }
   }
 
+  // console.log(jsonFile.servers[index].port);
   const socketClient = io.connect('http://localhost:' + jsonFile.servers[index].port);
   socketClient.on('connect', () => {
     socketClient.emit('serverStop');
     setTimeout(() => {
-      process.exit(0);
-    }, 1000);
+      // process.exit(0);
+    }, 500);
   });
-  console.log('stopped')
+  console.log('stopped '+jsonFile.servers[index].port)
 })
 
 
