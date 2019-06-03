@@ -19,6 +19,7 @@
   "build": {
     "productName": "Sloth",
     "appId": "com.example.yourapp",
+    "asar": false,
     "directories": {
       "output": "build"
     },
@@ -30,7 +31,6 @@
         {
           "x": 410,
           "y": 150,
-          "type": "link",
           "path": "/Applications"
         },
         {
@@ -55,6 +55,8 @@
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.20",
     "jquery": "^3.4.1",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
     "vue": "^2.6.10",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",

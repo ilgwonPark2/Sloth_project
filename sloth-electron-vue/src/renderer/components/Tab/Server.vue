@@ -23,6 +23,12 @@
 </template>
 
 <script>
+const { ipcRenderer } = require('electron')
+// console.log('front: sends ping ');
+// console.log(ipcRenderer.sendSync('synchronous-message', 'ping'))
+// ipcRenderer.on('asynchronous-reply', (event, arg) => {
+//   console.log(arg) // prints "pong"
+// })
 export default {
   name: 'home',
   data() {
@@ -79,14 +85,25 @@ export default {
        ]
      }
    },
+   mounted: function() {
+     console.log("hello world");
+     ipcRenderer.on('asynchronous-reply', (event, arg) => {
+       console.log(arg) // prints "pong"
+     })
+   },
    methods: {
      toggle_server(item){
-       var index2 = this.control_server(item);
+       var index2 = this.find_elem(item);
+       // console.log(ipcRenderer.sendSync('synchronous-message', 'ping'))
+       // ipcRenderer.sendSync('server_start', item);
+
+       ipcRenderer.sendSync('server_stop', item)
+
        this.items[index2].server_control = !this.items[index2].server_control;
      },
-     find_elem(item){
+     control_server(item){
      },
-     control_server(item_find){
+     find_elem(item_find){
        var result;
        this.items.forEach(function(item, index, arr){
          if(JSON.stringify(item_find) === JSON.stringify(item)) result = index;
