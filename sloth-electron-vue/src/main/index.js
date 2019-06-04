@@ -57,7 +57,7 @@ ipcMain.on('server_start', (event, arg) => {
   const app = express()
   const server = http.createServer(app);
 
-  var jsonFile = require('../../static/node_server/test_config')
+  var jsonFile = require('../../static/node_server/test_config.json')
   const s_name = arg
   var index = 0
   for (var i = 0; i < jsonFile.servers.length; i++) {
@@ -67,8 +67,8 @@ ipcMain.on('server_start', (event, arg) => {
     }
   }
   app.get('/', (req, res) => res.send('Hello World!'))
-  app.get('/test', (req, res) => res.send('test page, it is,' + jsonFile.servers[index].port))
-  server.listen(jsonFile.servers[index].port, () => console.log(`Example app listening on port ${jsonFile.servers[index].port }!`))
+  app.get('/test', (req, res) => res.send('test page, it is,' + jsonFile.servers[index].server_port))
+  server.listen(jsonFile.servers[index].server_port, () => console.log(`Example app listening on port ${jsonFile.servers[index].server_port }!`))
   const io = require('socket.io')(server)
   io.on('connection', (socketServer) => {
     socketServer.on('serverStop', () => {
@@ -81,7 +81,7 @@ ipcMain.on('server_start', (event, arg) => {
 
 ipcMain.on('server_stop', (event, arg) => {
   const io = require('socket.io-client');
-  var jsonFile = require('../../static/node_server/test_config')
+  var jsonFile = require('../../static/node_server/test_config.json')
   const s_name = arg
   var index = 0
   for (var i = 0; i < jsonFile.servers.length; i++) {
@@ -91,25 +91,24 @@ ipcMain.on('server_stop', (event, arg) => {
     }
   }
 
-  // console.log(jsonFile.servers[index].port);
-  const socketClient = io.connect('http://localhost:' + jsonFile.servers[index].port);
+  const socketClient = io.connect('http://localhost:' + jsonFile.servers[index].server_port);
   socketClient.on('connect', () => {
     socketClient.emit('serverStop');
     setTimeout(() => {
       // process.exit(0);
     }, 500);
   });
-  console.log('stopped '+jsonFile.servers[index].port)
+  console.log('stopped '+jsonFile.servers[index].server_port)
 })
 
 ipcMain.on('server_create', (event, arg) => {
-  console.log("server: receives" + arg.port) // prints "ping"
+  console.log("server: receives" + arg.server_port) // prints "ping"
   var exec = require('child_process').exec,
     child;
   var d_name = arg.server_name
-  var jsonFile = require('../../static/node_server/test_config')
-  // console.log(exec("pwd"))
+  var jsonFile = require('../../static/node_server/test_config.json')
   console.log(jsonFile)
+  console.log(require('path').dirname);
   child = exec("cp -r ./static/node_server/node_server1 ./static/node_server/" + d_name, function(err, stdout, stderr) {
     if (err !== null) {
       console.log('exec error:' + err);
@@ -118,15 +117,17 @@ ipcMain.on('server_create', (event, arg) => {
 
   var jb = {};
   jb['server_name'] = arg.server_name
-  jb['address'] = 'localhost'
-  jb['port'] = parseInt(arg.server_port)
+  jb['server_address'] = 'localhost'
+  jb['server_port'] = parseInt(arg.server_port)
   jsonFile.servers.push(jb)
 
   var obj = {};
   obj['servers'] = jsonFile.servers
 
   var json_str = JSON.stringify(obj, null, "\t")
-
+  var test = exec("pwd", function(err, stdout, stderr){
+    json_str = stdout;
+  })
   var fs = require('fs');
   fs.writeFile('./static/node_server/test_config.json', json_str, function(err) {
     if (err) throw err;
@@ -135,32 +136,30 @@ ipcMain.on('server_create', (event, arg) => {
   event.returnValue = null
 })
 
-ipcMain.on('server_delete', (event, arg) => {
+ipcMain.on('server_remove', (event, arg) => {
   var exec = require("child_process").exec, child;
-  var jsonFile = require('../../static/node_server/test_config')
+  var jsonFile = require('../../static/node_server/test_config.json')
   var d_name = arg
-  
+
   child = exec("rm -rf ./static/node_server/"+ d_name, function(err, stdout, stderr) {
-     // console.log('stdout: ' + stdout);
-     // console.log('stderr: ' + stderr);
       if(err !== null) {
           console.log('exec error: ' + err);
       }
   });
-  
-  for(i=0; i<jsonFile.servers.length; i++) {
+
+  for(var i=0; i<jsonFile.servers.length; i++) {
       if(d_name == jsonFile.servers[i].server_name) {
          jsonFile.servers.splice(i, 1);
       }
   }
-  
+
   var obj={};
   obj['servers']=jsonFile.servers
-  
+
   var json_str=JSON.stringify(obj, null, "\t")
-  
+
   var fs = require('fs');
-  fs.writeFile('../../static/node_server/test_config', json_str, function (err) {
+  fs.writeFile('./static/node_server/test_config.json', json_str, function (err) {
       if(err) throw err;
       console.log('Success');
   });
