@@ -29,6 +29,19 @@ const { ipcRenderer } = require('electron')
 // ipcRenderer.on('asynchronous-reply', (event, arg) => {
 //   console.log(arg) // prints "pong"
 // })
+var jsonFile = require('../../../../static/node_server/test_config.json')
+var jsonArr=[]
+
+for (var i = 0; i < jsonFile.servers.length; i++) {
+  var a = {}
+  a["server_control"]=false
+  a["server"]=jsonFile.servers[i].server_name
+  a["port"]=jsonFile.servers[i].port
+  a["performance"]= { memory: '20.33MB', cpu: i+'%', size:'200MB' }
+
+  jsonArr.push(a)
+}
+
 export default {
   name: 'home',
   data() {
@@ -57,44 +70,45 @@ export default {
            label: 'Remove'
          }
        },
-       items: [
-         {
-           server_control: false,
-           server: 'Node_server1',
-           port: '2222',
-           performance : { memory: '20.33MB', cpu: '2%', size:'200MB' }
-         },
-         // {
-         //   server_control: false,
-         //   server: 'Node_server2',
-         //   port: '8080',
-         //   performance : { memory: '114.2MB', cpu: '9%', size:'970MB' }
-         // },
-         // {
-         //   server_control: true,
-         //   server: 'MySQL',
-         //   port: '8080',
-         //   performance : { memory: '10.31MB', cpu: '5%', size:'29MB' }
-         // },
-         {
-           server_control: false,
-           server: 'ping',
-           port: '3333',
-           performance : { memory: '122.33MB', cpu: '1.5%', size:'889MB' }
-         }
-       ]
+       items : jsonArr
+      //  items: [
+      //    {
+      //      server_control: false,
+      //      server: 'Node_server1',
+      //      port: '1111',
+      //      performance : { memory: '20.33MB', cpu: '2%', size:'200MB' }
+      //    },
+      //    {
+      //      server_control: false,
+      //      server: 'ilgwon',
+      //      port: '2222',
+      //      performance : { memory: '114.2MB', cpu: '9%', size:'970MB' }
+      //    },
+      //    // {
+      //    //   server_control: true,
+      //    //   server: 'MySQL',
+      //    //   port: '8080',
+      //    //   performance : { memory: '10.31MB', cpu: '5%', size:'29MB' }
+      //    // },
+      //    {
+      //      server_control: false,
+      //      server: 'ping',
+      //      port: '3333',
+      //      performance : { memory: '122.33MB', cpu: '1.5%', size:'889MB' }
+      //    }
+      //  ]
      }
    },
    mounted: function() {
-     console.log("hello world");
+    //  console.log("hello world");
      // ipcRenderer.on('asynchronous-reply', (event, arg) => {
      //   console.log(arg) // prints "pong"
      // })
    },
    methods: {
      toggle_server(item){
-       console.log(item);
-       console.log(item.server);
+      //  console.log(item);
+      //  console.log(item.server);
        var index = this.find_elem(item);
        if(this.items[index].server_control){
        ipcRenderer.send('server_stop', item.server);
@@ -110,7 +124,7 @@ export default {
        this.items.forEach(function(item, index, arr){
          if(JSON.stringify(item_find) === JSON.stringify(item)) result = index;
        })
-       console.log(result);
+      //  console.log(result);
      return result;
      }
    }

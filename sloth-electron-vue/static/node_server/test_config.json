@@ -3,12 +3,12 @@
 		{
 			"server_name": "node_server1",
 			"address": "localhost",
-			"port": 2222
+			"port": 1111
 		},
 		{
-			"server_name": "ping",
+			"server_name": "ilgwon",
 			"address": "localhost",
-			"port": 3333
+			"port": 2222
 		}
 	]
 }
