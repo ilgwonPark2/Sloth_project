@@ -15,7 +15,7 @@ for(i=0; i<jsonFile.servers.length; i++) {
 
 
 app.get('/', (req, res) => res.send('Hello World!'))
-app.get('/test', (req, res) => res.send('test page, it is' + jsonFile.servers[index].port ))
+app.get('/test', (req, res) => res.send('test page, it is,' + jsonFile.servers[index].port ))
 
 server.listen(jsonFile.servers[index].port, () => console.log(`Example app listening on port ${jsonFile.servers[index].port }!`))
 
