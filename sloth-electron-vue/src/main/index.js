@@ -49,6 +49,9 @@ app.on('activate', () => {
 })
 
 
+// ipc interaction between server and front
+
+
 ipcMain.on('server_start', (event, arg) => {
   const express = require('express')
   const http = require('http')
@@ -100,38 +103,35 @@ ipcMain.on('server_stop', (event, arg) => {
   console.log('stopped '+jsonFile.servers[index].port)
 })
 
+ipcMain.on('server_create', (event, arg) => {
+  console.log("server: receives" + arg.port) // prints "ping"
+  var exec = require('child_process').exec,
+    child;
+  var d_name = arg.server_name
+  var jsonFile = require('../../static/node_server/test_config')
+  // console.log(exec("pwd"))
+  console.log(jsonFile)
+  child = exec("cp -r ./static/node_server/node_server1 ./static/node_server/" + d_name, function(err, stdout, stderr) {
+    if (err !== null) {
+      console.log('exec error:' + err);
+    }
+  });
 
+  var jb = {};
+  jb['server_name'] = arg.server_name
+  jb['address'] = 'localhost'
+  jb['port'] = parseInt(arg.server_port)
+  jsonFile.servers.push(jb)
 
-//
-// ipcMain.on('synchronous-message', (event, arg) => {
-//   console.log("server: receives" + arg) // prints "ping"
-//   var exec = require('child_process').exec,
-//     child;
-//   var d_name = arg
-//   var jsonFile = require('../../static/node_server/test_config')
-//   // console.log(exec("pwd"))
-//   console.log(jsonFile)
-//   child = exec("cp -r ./static/node_server/node_server1 ./static/node_server/" + d_name, function(err, stdout, stderr) {
-//     if (err !== null) {
-//       console.log('exec error:' + err);
-//     }
-//   });
-//
-//   var jb = {};
-//   jb['server_name'] = d_name
-//   jb['address'] = 'localhost'
-//   jb['port'] = 5555
-//   jsonFile.servers.push(jb)
-//
-//   var obj = {};
-//   obj['servers'] = jsonFile.servers
-//
-//   var json_str = JSON.stringify(obj, null, "\t")
-//
-//   var fs = require('fs');
-//   fs.writeFile('./static/node_server/test_config.json', json_str, function(err) {
-//     if (err) throw err;
-//     console.log('Saved!');
-//   });
-//   event.returnValue = null
-// })
+  var obj = {};
+  obj['servers'] = jsonFile.servers
+
+  var json_str = JSON.stringify(obj, null, "\t")
+
+  var fs = require('fs');
+  fs.writeFile('./static/node_server/test_config.json', json_str, function(err) {
+    if (err) throw err;
+    console.log('Saved!');
+  });
+  event.returnValue = null
+})
