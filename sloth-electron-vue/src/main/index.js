@@ -51,7 +51,6 @@ app.on('activate', () => {
 
 // ipc interaction between server and front
 
-
 ipcMain.on('server_start', (event, arg) => {
   const express = require('express')
   const http = require('http')
@@ -134,4 +133,35 @@ ipcMain.on('server_create', (event, arg) => {
     console.log('Saved!');
   });
   event.returnValue = null
+})
+
+ipcMain.on('server_delete', (event, arg) => {
+  var exec = require("child_process").exec, child;
+  var jsonFile = require('../../static/node_server/test_config')
+  var d_name = arg
+  
+  child = exec("rm -rf ./static/node_server/"+ d_name, function(err, stdout, stderr) {
+     // console.log('stdout: ' + stdout);
+     // console.log('stderr: ' + stderr);
+      if(err !== null) {
+          console.log('exec error: ' + err);
+      }
+  });
+  
+  for(i=0; i<jsonFile.servers.length; i++) {
+      if(d_name == jsonFile.servers[i].server_name) {
+         jsonFile.servers.splice(i, 1);
+      }
+  }
+  
+  var obj={};
+  obj['servers']=jsonFile.servers
+  
+  var json_str=JSON.stringify(obj, null, "\t")
+  
+  var fs = require('fs');
+  fs.writeFile('../../static/node_server/test_config', json_str, function (err) {
+      if(err) throw err;
+      console.log('Success');
+  });
 })
