@@ -100,27 +100,145 @@ export default {
     });
   },
   methods: {
+    server_info_memory(name, port) {
+      var info = {};
+      var fileSize = '';
+      var fileArr = '';
+      var s_name = name;
+      var s_port = port;
+      console.log(s_name, s_port)
+
+      var strArr = [];
+      var tmp_ids = ''
+      var tmp = ''
+      var pid = ''
+      var new_strArr=[]
+      var tmp_size=''
+      //test = require('path').join(__dirname, './static/node_server/')
+      var test = '/Users/jihae/Documents/GitHub/Sloth_project/sloth-electron-vue/static/node_server/';
+      // var exec = require("child_process").exec, child;
+      // child = exec("du -hs "+test+"jihae_server", function(err, stdout, stderr) {
+      //   fileSize=stdout
+      //   if(err !== null) {
+      //       console.log('exec error: ' + err);
+      //   }
+      //   var tmp_filesize = fileSize.split('/')
+      //   fileArr= child.tmp_filesize[0].split('\t')[0]
+
+      // });
+      // console.log(child.tmp_filesize)
+      // info["size"]=fileArr
+
+      // child.stdout.on('data', (data) => {
+      //   fileSize=data;
+      //   fileArr=fileSize.split('/')
+      //   info["size"]=fileArr[0].split('\t')[0]
+      // });
+
+      // fileSize=child.stdout
+      // fileArr=fileSize.split('/')
+      // info["size"] = fileArr[0].split('\t')[0]
+
+
+      try {
+        const execSync = require('child_process').execSync;
+        const stdout = execSync('du -hs '+test+s_name);
+        fileSize = stdout.toString().trim()
+        var tmp_filesize = fileSize.split('/')
+        fileArr= tmp_filesize[0].split('\t')[0]
+        info["size"]=fileArr
+
+      } catch (error) {
+        console.log(error)
+      }
+
+      try {
+        const stdout2 = execSync('lsof -iTCP:'+s_port);
+        tmp_ids = stdout2
+
+      } catch (error) {
+        info["cpu"]="0.0"
+        info["memory"]="0.0M"
+      }
+      if (tmp_ids == '') {
+            // alert('error: ' + err);
+      } else {
+            strArr = tmp_ids.split('\n')
+            for (var i=0; i<strArr.length; i++) {
+              if(strArr[i] !== '') {
+                new_strArr.push(strArr[i])
+              }
+            }
+            tmp = new_strArr.pop()
+            pid = tmp.split(' ')[1]
+            const stdout3 = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep '+pid);
+            tmp_ids = stdout
+
+            newArr = tmp_ids.split('\n')[0].split('  ')
+            info["cpu"] = newArr.pop()
+            info["memory"] = newArr.pop()
+      }
+
+      // child = exec("lsof -iTCP:"+port, function (err, stdout, stderr) {
+      //   tmp_ids = stdout
+
+      //   if (tmp_ids == '') {
+      //       // alert('error: ' + err);
+      //       info["cpu"]="0.0"
+      //       info["memory"]="0.0M"
+      //   } else {
+      //       strArr = tmp_ids.split('\n')
+      //       for (var i=0; i<strArr.length; i++) {
+      //         if(strArr[i] !== '') {
+      //           new_strArr.push(strArr[i])
+      //         }
+      //       }
+      //       tmp = new_strArr.pop()
+      //       pid = tmp.split(' ')[1]
+      //       p=true
+      //   }
+      // });
+      // console.log(typeof info)
+      // console.log(info["size"])
+      // if (p==true) {
+      //   child = exec("ps -eo pid,rss,vsize,pmem,pcpu | grep "+pid, function (err, stdout, stderr) {
+      //   tmp_ids = stdout
+      //   if (err !== null) {
+      //       alert('error: ' + err);
+      //   }
+      //   newArr = tmp_ids.split('\n')[0].split('  ')
+      //   info["cpu"] = newArr.pop()
+      //   info["memory"] = newArr.pop()
+      //  });
+      // }
+
+      // console.log(info)
+      return info;
+    },
     server_info(file){
       this.items = {}
       var jsonFile = file;
       var jsonArr = []
-
       for (var i = 0; i < jsonFile.servers.length; i++) {
         var item = {}
+        var perform = {}
         item["server_control"] = false
         item["server_name"] = jsonFile.servers[i].server_name
         item["server_port"] = jsonFile.servers[i].server_port
+        perform = this.server_info_memory(a["server_name"], a["server_port"])
         item["performance"] = {
-          memory: '20.33MB',
-          cpu: i + '%',
-          size: '200MB'
+          memory: perform.memory,
+          cpu: perform.cpu + "%",
+          size: perform.size
         }
         jsonArr.push(item);
       }
+
       this.items = jsonArr
       for (var i = 0; i < jsonFile.servers.length; i++) {
         this.server_status_check(jsonFile.servers[i].server_port, i)
       }
+
     },
     server_toggle(item) {
       var index = this.find_elem(item);
@@ -147,23 +265,17 @@ export default {
     },
     server_status_check(server_port, idx){
       // Make a request for a user with a given ID
-      // var index = this.find_elem(item);
       axios.get('http://localhost:' + server_port)
         .then(response => {
           // handle success
           // console.log("response: " + JSON.stringify(response));
-          // var index = this.find_elem(item);
           this.items[idx].server_control = true;
-          // this.items[i].server
         })
         .catch(error => {
           // handle error
           // console.log("error: " + error);
           this.items[idx].server_control = false;
         })
-        // setTimeout(function(){
-        //     console.log(result)
-        //   }, 200);
     },
     find_elem(item_find) {
       var result;
