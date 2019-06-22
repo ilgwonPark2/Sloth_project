@@ -16,7 +16,7 @@
           </b-button>
         </template>
         <template slot="server_removal" slot-scope="row">
-          <b-button size="md" class="fa fa-trash" @click="item_remove = row.item.server_name;"v-b-modal.node-server-remove-modal pill aria-hidden="true">
+          <b-button size="md" class="fa fa-trash" @click="item_remove = row.item.server_name;" v-b-modal.node-server-remove-modal pill aria-hidden="true">
           </b-button>
         </template>
       </b-table>
@@ -37,7 +37,7 @@
     </b-form>
     <template slot="modal-footer" slot-scope="{ ok, cancel }">
      <!-- Emulate built in modal footer ok and cancel button actions -->
-     <b-button size="sm" variant="success" @click="ok()">
+     <b-button size="sm" variant="success" @click="ok();cancle()">
        Create
      </b-button>
      <b-button size="sm" variant="danger" @click="cancel()">
@@ -50,7 +50,7 @@
     Are you sure to remove this server?
     <template slot="modal-footer" slot-scope="{ ok, cancel }">
      <!-- Emulate built in modal footer ok and cancel button actions -->
-     <b-button size="sm" variant="success" @click="ok()">
+     <b-button size="sm" variant="success" @click="ok();cancel()">
        Remove
      </b-button>
      <b-button size="sm" variant="danger" @click="cancel()">
@@ -103,36 +103,160 @@ export default {
     }
   },
   mounted: function() {
-    ipcRenderer.on('asynchronous-reply', (event, arg) => {
-      alert(JSON.stringify(arg))
-    });
-
     ipcRenderer.send('server_info');
     ipcRenderer.on('server_info_reply', (event, arg) => {
       this.server_info(arg)
     });
   },
   methods: {
+    server_info_memory(name, port) {  
+      var info = {};
+      var fileSize = '';
+      var fileArr = '';
+      var s_name = name;
+      var s_port = port; 
+      console.log(s_name, s_port)
+
+      var strArr = [];
+      var tmp_ids = ''
+      var tmp = ''
+      var pid = ''
+      var new_strArr=[]
+      var tmp_size=''
+      //test = require('path').join(__dirname, './static/node_server/')
+      var test = '/Users/jihae/Documents/GitHub/Sloth_project/sloth-electron-vue/static/node_server/';
+      // var exec = require("child_process").exec, child;
+      // child = exec("du -hs "+test+"jihae_server", function(err, stdout, stderr) {
+      //   fileSize=stdout
+      //   if(err !== null) {
+      //       console.log('exec error: ' + err);
+      //   } 
+      //   var tmp_filesize = fileSize.split('/')
+      //   fileArr= child.tmp_filesize[0].split('\t')[0]
+
+      // });
+      // console.log(child.tmp_filesize)
+      // info["size"]=fileArr
+      
+      // child.stdout.on('data', (data) => {
+      //   fileSize=data;
+      //   fileArr=fileSize.split('/')
+      //   info["size"]=fileArr[0].split('\t')[0]
+      // });
+
+      // fileSize=child.stdout
+      // fileArr=fileSize.split('/')
+      // info["size"] = fileArr[0].split('\t')[0]
+      
+
+      try {
+        const execSync = require('child_process').execSync;
+        const stdout = execSync('du -hs '+test+s_name);
+        fileSize = stdout.toString().trim()
+        var tmp_filesize = fileSize.split('/')
+        fileArr= tmp_filesize[0].split('\t')[0]
+        info["size"]=fileArr
+        
+      } catch (error) {
+        console.log(error)
+      }
+
+      try {
+        const stdout2 = execSync('lsof -iTCP:'+s_port);
+        tmp_ids = stdout2
+
+      } catch (error) {
+        info["cpu"]="0.0"
+        info["memory"]="0.0M"
+      }
+      if (tmp_ids == '') {
+            // alert('error: ' + err);
+      } else {
+            strArr = tmp_ids.split('\n')
+            for (var i=0; i<strArr.length; i++) {
+              if(strArr[i] !== '') {
+                new_strArr.push(strArr[i])
+              }
+            }
+            tmp = new_strArr.pop()
+            pid = tmp.split(' ')[1]
+            const stdout3 = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep '+pid);
+            tmp_ids = stdout 
+
+            newArr = tmp_ids.split('\n')[0].split('  ')
+            info["cpu"] = newArr.pop()
+            info["memory"] = newArr.pop()
+      }     
+
+      // child = exec("lsof -iTCP:"+port, function (err, stdout, stderr) {
+      //   tmp_ids = stdout
+
+      //   if (tmp_ids == '') {
+      //       // alert('error: ' + err);
+      //       info["cpu"]="0.0"
+      //       info["memory"]="0.0M"
+      //   } else {
+      //       strArr = tmp_ids.split('\n')
+      //       for (var i=0; i<strArr.length; i++) {
+      //         if(strArr[i] !== '') {
+      //           new_strArr.push(strArr[i])
+      //         }
+      //       }
+      //       tmp = new_strArr.pop()
+      //       pid = tmp.split(' ')[1]
+      //       p=true
+      //   }     
+      // });
+      // console.log(typeof info)
+      // console.log(info["size"])
+      // if (p==true) {
+      //   child = exec("ps -eo pid,rss,vsize,pmem,pcpu | grep "+pid, function (err, stdout, stderr) {
+      //   tmp_ids = stdout 
+      //   if (err !== null) {
+      //       alert('error: ' + err);
+      //   }
+      //   newArr = tmp_ids.split('\n')[0].split('  ')
+      //   info["cpu"] = newArr.pop()
+      //   info["memory"] = newArr.pop()
+      //  });
+      // }
+      
+      // console.log(info)
+      return info;
+    },
     server_info(file){
-      alert("hey, server_info" + file)
       this.items = null
       var jsonFile = file;
       var jsonArr = []
-
       for (var i = 0; i < jsonFile.servers.length; i++) {
         var a = {}
+        var perform = {}
         a["server_control"] = false
         a["server_name"] = jsonFile.servers[i].server_name
         a["server_port"] = jsonFile.servers[i].server_port
+        
+        perform = this.server_info_memory(a["server_name"], a["server_port"])
+
+        console.log(perform)
+        console.log(perform.keys)
         a["performance"] = {
-          memory: '20.33MB',
-          cpu: i + '%',
-          size: '200MB'
+          memory: perform.memory,
+          cpu: perform.cpu + "%",
+          size: perform.size
         }
         jsonArr.push(a);
+
       }
-      alert(JSON.stringify(jsonArr))
+
+        // a["performance"] = {
+        //   memory: 222,
+        //   cpu: i + "%",
+        //   size: '200MB'
+        // }
+      // }
+      // alert(JSON.stringify(jsonArr))
       this.items = jsonArr
+
     },
     server_toggle(item) {
       var index = this.find_elem(item);
