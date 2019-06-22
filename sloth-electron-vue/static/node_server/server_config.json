@@ -1,0 +1,29 @@
+{
+	"servers": [
+		{
+			"server_name": "node_server1",
+			"server_address": "localhost",
+			"server_port": 2222
+		},
+		{
+			"server_name": "ilgwon",
+			"server_address": "localhost",
+			"server_port": 1242
+		},
+		{
+			"server_name": "gold",
+			"server_address": "localhost",
+			"server_port": 7777
+		},
+		{
+			"server_name": "test",
+			"server_address": "localhost",
+			"server_port": 1111
+		},
+		{
+			"server_name": "test2",
+			"server_address": "localhost",
+			"server_port": 2222
+		}
+	]
+}

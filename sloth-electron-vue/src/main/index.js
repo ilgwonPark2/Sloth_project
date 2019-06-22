@@ -34,15 +34,15 @@ function createWindow() {
     mainWindow = null
   })
   // const globalShortcut = app.globalShortcut
-  
+
   globalShortcut.register('f5', function() {
-		console.log('f5 is pressed')
-		mainWindow.reload()
-	})
-	globalShortcut.register('CommandOrControl+R', function() {
-		console.log('CommandOrControl+R is pressed')
-		mainWindow.reload()
-	})
+    console.log('f5 is pressed')
+    mainWindow.reload()
+  })
+  globalShortcut.register('CommandOrControl+R', function() {
+    console.log('CommandOrControl+R is pressed')
+    mainWindow.reload()
+  })
 }
 
 app.on('ready', createWindow)
@@ -60,10 +60,20 @@ app.on('activate', () => {
 })
 
 
-// ipc interaction between server and front
+
+
+
+
+
+/**
+ * *** IPC interaction code ***
+ * ipc interaction between server and front
+ */
+
+
 
 ipcMain.on('server_info', (event, arg) => {
-  var jsonFile = require('../../static/node_server/test_config.json')
+  var jsonFile = require('../../static/node_server/server_config.json')
   event.sender.send('server_info_reply', jsonFile);
 })
 
@@ -73,7 +83,7 @@ ipcMain.on('server_start', (event, arg) => {
   const app = express()
   const server = http.createServer(app);
 
-  var jsonFile = require('../../static/node_server/test_config.json')
+  var jsonFile = require('../../static/node_server/server_config.json')
   const s_name = arg
   var index = 0
   for (var i = 0; i < jsonFile.servers.length; i++) {
@@ -82,6 +92,13 @@ ipcMain.on('server_start', (event, arg) => {
       break;
     }
   }
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token, X-Requested-With");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+    next();
+  });
+
   app.get('/', (req, res) => res.send('Hello World!'))
   app.get('/test', (req, res) => res.send('test page, it is,' + jsonFile.servers[index].server_port))
   server.listen(jsonFile.servers[index].server_port, () => console.log(`Example app listening on port ${jsonFile.servers[index].server_port }!`))
@@ -97,7 +114,7 @@ ipcMain.on('server_start', (event, arg) => {
 
 ipcMain.on('server_stop', (event, arg) => {
   const io = require('socket.io-client');
-  var jsonFile = require('../../static/node_server/test_config.json')
+  var jsonFile = require('../../static/node_server/server_config.json')
   const s_name = arg
   var index = 0
   for (var i = 0; i < jsonFile.servers.length; i++) {
@@ -110,29 +127,23 @@ ipcMain.on('server_stop', (event, arg) => {
   const socketClient = io.connect('http://localhost:' + jsonFile.servers[index].server_port);
   socketClient.on('connect', () => {
     socketClient.emit('serverStop');
-    setTimeout(() => {
-      // process.exit(0);
+    setTimeout(() => {// process.exit(0);
     }, 500);
   });
-  console.log('stopped '+jsonFile.servers[index].server_port)
+  console.log('stopped ' + jsonFile.servers[index].server_port)
 
 })
 
 ipcMain.on('server_create', (event, arg) => {
-  console.log("server: receives" + arg.server_port) // prints "ping"
-  var exec = require('child_process').exec,
-    child;
+  // console.log("server: receives" + arg.server_port) // prints "ping"
+  var exec = require('child_process').exec, child;
   var d_name = arg.server_name
-  var jsonFile = require('../../static/node_server/test_config.json')
-  // console.log(jsonFile)
-  // console.log(require('path').dirname);
+  var jsonFile = require('../../static/node_server/server_config.json')
+  var dir = require('path').join(__dirname, './static/node_server/')
 
-  var test= require('path').join(__dirname, './static/node_server/')
-  child = exec("cp -r " + test +"node_server1 "+ test + d_name, function(err, stdout, stderr) {
-    if (err !== null) {
-      console.log('exec error:' + err);
-      event.sender.send('asynchronous-reply', err);
-    }
+  child = exec("cp -r " + dir + "node_server1 " + dir + d_name, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+          // console.log('exec error:' + err);
   });
 
   var jb = {};
@@ -143,46 +154,35 @@ ipcMain.on('server_create', (event, arg) => {
 
   var obj = {};
   obj['servers'] = jsonFile.servers
-
   var json_str = JSON.stringify(obj, null, "\t")
-  // var test = exec("touch ilgwon.txt", function(err, stdout, stderr){
-  //   json_str = stdout;
-  // })
   var fs = require('fs');
 
-  fs.writeFileSync(require('path').join(__dirname, '/static/node_server/test_config.json'),  json_str, function(err) {
-  // fs.writeFile('./dist/electron/static/node_server/test_config.json', json_str, function(err) {
+  fs.writeFileSync(dir + 'server_config.json', json_str, function(err) {
     if (err) throw err;
-    console.log('Saved!');
   });
   event.returnValue = null
 })
 
 ipcMain.on('server_remove', (event, arg) => {
   var exec = require("child_process").exec, child;
-  var jsonFile = require('../../static/node_server/test_config.json')
+  var jsonFile = require('../../static/node_server/server_config.json')
   var d_name = arg
+  var dir = require('path').join(__dirname, './static/node_server/')
 
-  child = exec("rm -rf ./static/node_server/"+ d_name, function(err, stdout, stderr) {
-      if(err !== null) {
-          console.log('exec error: ' + err);
-      }
+  child = exec("rm -rf " + dir + d_name, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+          // console.log('exec error: ' + err);
   });
 
-  for(var i=0; i<jsonFile.servers.length; i++) {
-      if(d_name == jsonFile.servers[i].server_name) {
-         jsonFile.servers.splice(i, 1);
-      }
-  }
+  for (var i = 0; i < jsonFile.servers.length; i++)  if (d_name == jsonFile.servers[i].server_name) jsonFile.servers.splice(i, 1);
 
-  var obj={};
-  obj['servers']=jsonFile.servers
-
-  var json_str=JSON.stringify(obj, null, "\t")
-
+  var obj = {};
+  obj['servers'] = jsonFile.servers
+  var json_str = JSON.stringify(obj, null, "\t")
   var fs = require('fs');
-  fs.writeFile('./static/node_server/test_config.json', json_str, function (err) {
-      if(err) throw err;
-      console.log('Success');
+
+  fs.writeFile(dir + "server_config.json", json_str, function(err) {
+    if (err) throw err;
+    console.log('Success');
   });
 })
