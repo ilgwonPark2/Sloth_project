@@ -114,32 +114,7 @@ export default {
       var pid = ''
       var new_strArr=[]
       var tmp_size=''
-      //test = require('path').join(__dirname, './static/node_server/')
       var test = '/Users/jihae/Documents/GitHub/Sloth_project/sloth-electron-vue/static/node_server/';
-      // var exec = require("child_process").exec, child;
-      // child = exec("du -hs "+test+"jihae_server", function(err, stdout, stderr) {
-      //   fileSize=stdout
-      //   if(err !== null) {
-      //       console.log('exec error: ' + err);
-      //   }
-      //   var tmp_filesize = fileSize.split('/')
-      //   fileArr= child.tmp_filesize[0].split('\t')[0]
-
-      // });
-      // console.log(child.tmp_filesize)
-      // info["size"]=fileArr
-
-      // child.stdout.on('data', (data) => {
-      //   fileSize=data;
-      //   fileArr=fileSize.split('/')
-      //   info["size"]=fileArr[0].split('\t')[0]
-      // });
-
-      // fileSize=child.stdout
-      // fileArr=fileSize.split('/')
-      // info["size"] = fileArr[0].split('\t')[0]
-
-
       try {
         const execSync = require('child_process').execSync;
         const stdout = execSync('du -hs '+test+s_name);
@@ -178,41 +153,6 @@ export default {
             info["cpu"] = newArr.pop()
             info["memory"] = newArr.pop()
       }
-
-      // child = exec("lsof -iTCP:"+port, function (err, stdout, stderr) {
-      //   tmp_ids = stdout
-
-      //   if (tmp_ids == '') {
-      //       // alert('error: ' + err);
-      //       info["cpu"]="0.0"
-      //       info["memory"]="0.0M"
-      //   } else {
-      //       strArr = tmp_ids.split('\n')
-      //       for (var i=0; i<strArr.length; i++) {
-      //         if(strArr[i] !== '') {
-      //           new_strArr.push(strArr[i])
-      //         }
-      //       }
-      //       tmp = new_strArr.pop()
-      //       pid = tmp.split(' ')[1]
-      //       p=true
-      //   }
-      // });
-      // console.log(typeof info)
-      // console.log(info["size"])
-      // if (p==true) {
-      //   child = exec("ps -eo pid,rss,vsize,pmem,pcpu | grep "+pid, function (err, stdout, stderr) {
-      //   tmp_ids = stdout
-      //   if (err !== null) {
-      //       alert('error: ' + err);
-      //   }
-      //   newArr = tmp_ids.split('\n')[0].split('  ')
-      //   info["cpu"] = newArr.pop()
-      //   info["memory"] = newArr.pop()
-      //  });
-      // }
-
-      // console.log(info)
       return info;
     },
     server_info(file){
@@ -225,7 +165,7 @@ export default {
         item["server_control"] = false
         item["server_name"] = jsonFile.servers[i].server_name
         item["server_port"] = jsonFile.servers[i].server_port
-        perform = this.server_info_memory(a["server_name"], a["server_port"])
+        perform = this.server_info_memory(item["server_name"], item["server_port"])
         item["performance"] = {
           memory: perform.memory,
           cpu: perform.cpu + "%",
