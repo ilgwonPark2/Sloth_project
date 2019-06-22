@@ -1,7 +1,8 @@
 import {
   app,
   BrowserWindow,
-  ipcMain
+  ipcMain,
+  globalShortcut
 } from 'electron'
 
 /**
@@ -32,6 +33,16 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+  // const globalShortcut = app.globalShortcut
+  
+  globalShortcut.register('f5', function() {
+		console.log('f5 is pressed')
+		mainWindow.reload()
+	})
+	globalShortcut.register('CommandOrControl+R', function() {
+		console.log('CommandOrControl+R is pressed')
+		mainWindow.reload()
+	})
 }
 
 app.on('ready', createWindow)
@@ -50,6 +61,11 @@ app.on('activate', () => {
 
 
 // ipc interaction between server and front
+
+ipcMain.on('server_info', (event, arg) => {
+  var jsonFile = require('../../static/node_server/test_config.json')
+  event.sender.send('server_info_reply', jsonFile);
+})
 
 ipcMain.on('server_start', (event, arg) => {
   const express = require('express')
@@ -99,6 +115,7 @@ ipcMain.on('server_stop', (event, arg) => {
     }, 500);
   });
   console.log('stopped '+jsonFile.servers[index].server_port)
+
 })
 
 ipcMain.on('server_create', (event, arg) => {
@@ -107,11 +124,14 @@ ipcMain.on('server_create', (event, arg) => {
     child;
   var d_name = arg.server_name
   var jsonFile = require('../../static/node_server/test_config.json')
-  console.log(jsonFile)
-  console.log(require('path').dirname);
-  child = exec("cp -r ./static/node_server/node_server1 ./static/node_server/" + d_name, function(err, stdout, stderr) {
+  // console.log(jsonFile)
+  // console.log(require('path').dirname);
+
+  var test= require('path').join(__dirname, './static/node_server/')
+  child = exec("cp -r " + test +"node_server1 "+ test + d_name, function(err, stdout, stderr) {
     if (err !== null) {
       console.log('exec error:' + err);
+      event.sender.send('asynchronous-reply', err);
     }
   });
 
@@ -125,11 +145,13 @@ ipcMain.on('server_create', (event, arg) => {
   obj['servers'] = jsonFile.servers
 
   var json_str = JSON.stringify(obj, null, "\t")
-  var test = exec("pwd", function(err, stdout, stderr){
-    json_str = stdout;
-  })
+  // var test = exec("touch ilgwon.txt", function(err, stdout, stderr){
+  //   json_str = stdout;
+  // })
   var fs = require('fs');
-  fs.writeFile('./static/node_server/test_config.json', json_str, function(err) {
+
+  fs.writeFileSync(require('path').join(__dirname, '/static/node_server/test_config.json'),  json_str, function(err) {
+  // fs.writeFile('./dist/electron/static/node_server/test_config.json', json_str, function(err) {
     if (err) throw err;
     console.log('Saved!');
   });

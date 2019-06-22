@@ -93,7 +93,7 @@ export default {
           label: 'Remove'
         }
       },
-      items: {},
+      items: [],
       form: {
         server_name: '',
         server_port: ''
@@ -103,11 +103,20 @@ export default {
     }
   },
   mounted: function() {
-    this.server_info();
+    ipcRenderer.on('asynchronous-reply', (event, arg) => {
+      alert(JSON.stringify(arg))
+    });
+
+    ipcRenderer.send('server_info');
+    ipcRenderer.on('server_info_reply', (event, arg) => {
+      this.server_info(arg)
+    });
   },
   methods: {
-    server_info(){
-      var jsonFile = require('../../../../static/node_server/test_config.json')
+    server_info(file){
+      alert("hey, server_info" + file)
+      this.items = null
+      var jsonFile = file;
       var jsonArr = []
 
       for (var i = 0; i < jsonFile.servers.length; i++) {
@@ -122,6 +131,7 @@ export default {
         }
         jsonArr.push(a);
       }
+      alert(JSON.stringify(jsonArr))
       this.items = jsonArr
     },
     server_toggle(item) {
@@ -137,6 +147,7 @@ export default {
     server_create(item) {
       console.log(item);
       ipcRenderer.send('server_create', item);
+      ipcRenderer.send('server_info');
     },
     server_remove(item) {
       // console.log(this.item_remove);
@@ -152,8 +163,8 @@ export default {
     },
     onSubmit(evt) {
       evt.preventDefault();
-      console.log(evt);
-      console.log(evt.componentId);
+      // console.log(evt);
+      // console.log(evt.componentId);
       switch (evt.componentId) {
         case "node-server-create-modal":
           this.server_create(this.form);
@@ -165,6 +176,7 @@ export default {
         default:
           // code block
       }
+      this.show = !this.show;
     },
     onReset(evt) {
       evt.preventDefault()
@@ -173,12 +185,9 @@ export default {
       this.form.server_port = ''
       // Trick to reset/clear native browser form validation state
       this.show = false
-      this.$nextTick(() => {
-        this.show = true
-      })
-    },
-    test(item){
-      alert(item);
+      // this.$nextTick(() => {
+      //   this.show = true
+      // })
     }
   }
 }

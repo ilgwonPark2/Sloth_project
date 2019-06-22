@@ -31,6 +31,7 @@
         {
           "x": 410,
           "y": 150,
+          "type": "link",
           "path": "/Applications"
         },
         {
