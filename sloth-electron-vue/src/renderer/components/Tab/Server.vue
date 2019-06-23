@@ -102,19 +102,14 @@ export default {
   methods: {
     server_info_memory(name, port) {
       var info = {};
-      var fileSize = '';
-      var fileArr = '';
+      var fileSize = '', fileArr = '';
       var s_name = name;
       var s_port = port;
       console.log(s_name, s_port)
 
-      var strArr = [];
-      var tmp_ids = ''
-      var tmp = ''
-      var pid = ''
-      var new_strArr=[]
-      var tmp_size=''
-      var test = '/Users/jihae/Documents/GitHub/Sloth_project/sloth-electron-vue/static/node_server/';
+      var strArr = [], new_strArr = []
+      var tmp_ids = '', tmp = '', pid = '', tmp_size=''
+      var test = require('path').join(__dirname, './static/node_server/')
       try {
         const execSync = require('child_process').execSync;
         const stdout = execSync('du -hs '+test+s_name);
@@ -198,7 +193,7 @@ export default {
     },
     server_ControlAll(status){
       if(status === "StartAll"){
-        // fr
+        //
       } else {
 
       }
