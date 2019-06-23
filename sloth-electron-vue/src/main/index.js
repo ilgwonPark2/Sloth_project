@@ -139,9 +139,11 @@ ipcMain.on('server_create', (event, arg) => {
   var exec = require('child_process').exec, child;
   var d_name = arg.server_name
   var jsonFile = require('../../static/node_server/server_config.json')
-  var dir = require('path').join(__dirname, './static/node_server/')
+  var base = './static/node_server/'
+  var dir = require('path').join(__dirname, base)
+  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
 
-  child = exec("cp -r " + dir + "node_server1 " + dir + d_name, function(err, stdout, stderr) {
+  child = exec("cp -r " + dir_exec + "node_server1 " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
           // console.log('exec error:' + err);
   });
@@ -157,7 +159,7 @@ ipcMain.on('server_create', (event, arg) => {
   var json_str = JSON.stringify(obj, null, "\t")
   var fs = require('fs');
 
-  fs.writeFileSync(dir + 'server_config.json', json_str, function(err) {
+  fs.writeFileSync(dir_exec + 'server_config.json', json_str, function(err) {
     if (err) throw err;
   });
   event.returnValue = null
@@ -167,9 +169,11 @@ ipcMain.on('server_remove', (event, arg) => {
   var exec = require("child_process").exec, child;
   var jsonFile = require('../../static/node_server/server_config.json')
   var d_name = arg
-  var dir = require('path').join(__dirname, './static/node_server/')
+  var base = './static/node_server/'
+  var dir = require('path').join(__dirname, base)
+  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
 
-  child = exec("rm -rf " + dir + d_name, function(err, stdout, stderr) {
+  child = exec("rm -rf " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
           // console.log('exec error: ' + err);
   });
@@ -181,7 +185,7 @@ ipcMain.on('server_remove', (event, arg) => {
   var json_str = JSON.stringify(obj, null, "\t")
   var fs = require('fs');
 
-  fs.writeFile(dir + "server_config.json", json_str, function(err) {
+  fs.writeFile(dir_exec + "server_config.json", json_str, function(err) {
     if (err) throw err;
     console.log('Success');
   });
