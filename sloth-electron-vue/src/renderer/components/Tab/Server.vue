@@ -3,8 +3,8 @@
   <b-container style="margin-top:50px;">
     <b-row align-h="end">
       <b-button v-b-modal.node-server-create-modal pill variant="warning">New Node Server</b-button>
-      <b-button style="margin-left:15px;" pill variant="success">Start All</b-button>
-      <b-button style="margin-left:15px;" pill variant="success">Stop All</b-button>
+      <b-button style="margin-left:15px;" pill variant="success" @click="server_controlAll('start')">Start All</b-button>
+      <b-button style="margin-left:15px;" pill variant="success" @click="server_controlAll('stop')">Stop All</b-button>
     </b-row>
   </b-container>
   <b-container style="margin-top:50px;">
@@ -16,8 +16,7 @@
           </b-button>
         </template>
         <template slot="server_removal" slot-scope="row">
-          <b-button size="md" class="fa fa-trash" @click="item_remove = row.item;" v-b-modal.node-server-remove-modal pill aria-hidden="true">
-          </b-button>
+          <b-button size="md" class="fa fa-trash" @click="item_remove = row.item;" v-b-modal.node-server-remove-modal pill aria-hidden="true"></b-button>
         </template>
       </b-table>
     </b-row>
@@ -37,12 +36,8 @@
     </b-form>
     <template slot="modal-footer" slot-scope="{ ok, cancel }">
      <!-- Emulate built in modal footer ok and cancel button actions -->
-     <b-button size="sm" variant="success" @click="ok();cancel()">
-       Create
-     </b-button>
-     <b-button size="sm" variant="danger" @click="cancel()">
-       Cancel
-     </b-button>
+     <b-button size="sm" variant="success" @click="ok();cancel()"> Create </b-button>
+     <b-button size="sm" variant="danger" @click="cancel()"> Cancel </b-button>
    </template>
   </b-modal>
 
@@ -50,12 +45,8 @@
     Are you sure to remove this server?
     <template slot="modal-footer" slot-scope="{ ok, cancel }">
      <!-- Emulate built in modal footer ok and cancel button actions -->
-     <b-button size="sm" variant="success" @click="ok();cancel()">
-       Remove
-     </b-button>
-     <b-button size="sm" variant="danger" @click="cancel()">
-       Cancel
-     </b-button>
+     <b-button size="sm" variant="success" @click="ok();cancel()"> Remove </b-button>
+     <b-button size="sm" variant="danger" @click="cancel()"> Cancel </b-button>
    </template>
   </b-modal>
 </div>
@@ -152,7 +143,6 @@ export default {
         }
         jsonArr.push(item);
       }
-
       this.items = jsonArr
       for (var i = 0; i < jsonFile.servers.length; i++) {
         this.server_status_check(jsonFile.servers[i].server_port, i)
@@ -163,7 +153,6 @@ export default {
       var index = this.find_elem(item);
       if (this.items[index].server_control) ipcRenderer.send('server_stop', item.server_name);
       else ipcRenderer.send('server_start', item.server_name);
-
       this.items[index].server_control = !this.items[index].server_control;
     },
     server_create(item) {
@@ -175,26 +164,18 @@ export default {
       ipcRenderer.send('server_remove', item.server_name);
       ipcRenderer.send('server_info');
     },
-    server_ControlAll(status){
-      if(status === "StartAll"){
-        //
-      } else {
-
-      }
+    server_controlAll(status){
+      var param_toggle = (status === "start") ? 'server_start' : 'server_stop'
+      this.items.forEach(function(item, arr) { ipcRenderer.send( param_toggle, item.server_name) })
+      setTimeout(() => {
+        ipcRenderer.send('server_info');
+      }, 500);
     },
     server_status_check(server_port, idx){
       // Make a request for a user with a given ID
       axios.get('http://localhost:' + server_port)
-        .then(response => {
-          // handle success
-          // console.log("response: " + JSON.stringify(response));
-          this.items[idx].server_control = true;
-        })
-        .catch(error => {
-          // handle error
-          // console.log("error: " + error);
-          this.items[idx].server_control = false;
-        })
+        .then(response => { this.items[idx].server_control = true; })
+        .catch(error => { this.items[idx].server_control = false;})
     },
     find_elem(item_find) {
       var result;
