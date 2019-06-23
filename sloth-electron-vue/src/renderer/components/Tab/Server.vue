@@ -94,35 +94,38 @@ export default {
       var base = './static/node_server/'
       var dir = require('path').join(__dirname, base)
       var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+      const execSync = require('child_process').execSync
+      let stdout = execSync('du -hs ' + dir_exec + s_name)
       try {
-        const execSync = require('child_process').execSync;
-        const stdout = execSync('du -hs ' + dir_exec + s_name);
+        stdout = execSync('du -hs ' + dir_exec + s_name);
         fileSize = stdout.toString().trim()
         var tmp_filesize = fileSize.split('/')
-        fileArr= tmp_filesize[0].split('\t')[0]
-        info["size"]=fileArr
+        fileArr = tmp_filesize[0].split('\t')[0]
+        info["size"] = fileArr
       } catch (error) { console.log(error)}
 
       try {
-        const stdout2 = execSync('lsof -iTCP:' + s_port);
-        tmp_ids = stdout2
+        stdout = execSync('lsof -iTCP:' + s_port);
+        tmp_ids = String.fromCharCode.apply(null, stdout)
       } catch (error) {
+        console.log("error:  "  + error)
         info["cpu"] = "0.0"
         info["memory"] = "0.0M"
       }
       if (tmp_ids == '') { // alert('error: ' + err);
       } else {
-            strArr = tmp_ids.split('\n')
-            for (var i=0; i<strArr.length; i++) {
-              if(strArr[i] !== '') { new_strArr.push(strArr[i]) }
-            }
-            tmp = new_strArr.pop()
-            pid = tmp.split(' ')[1]
-            const stdout3 = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep ' + pid);
-            tmp_ids = stdout
-            newArr = tmp_ids.split('\n')[0].split('  ')
-            info["cpu"] = newArr.pop()
-            info["memory"] = newArr.pop()
+          strArr = tmp_ids.split('\n')
+          for (var i=0; i<strArr.length; i++) {
+            if(strArr[i] !== '') { new_strArr.push(strArr[i]) }
+          }
+          tmp = new_strArr.pop()
+          pid = tmp.split(' ')[1]
+          stdout = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep ' + pid)
+          tmp_ids = String.fromCharCode.apply(null, stdout)
+          console.log(tmp_ids)
+          var newArr = tmp_ids.split('\n')[0].split('  ')
+          info["cpu"] = newArr.pop()
+          info["memory"] = newArr.pop()
       }
       return info;
     },
@@ -147,7 +150,6 @@ export default {
       for (var i = 0; i < jsonFile.servers.length; i++) {
         this.server_status_check(jsonFile.servers[i].server_port, i)
       }
-
     },
     server_toggle(item) {
       var index = this.find_elem(item);
