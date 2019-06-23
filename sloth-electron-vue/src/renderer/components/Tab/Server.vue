@@ -90,60 +90,45 @@ export default {
     }
   },
   mounted: function() {
-    ipcRenderer.on('Error', (event, arg) => {
-      alert(JSON.stringify(arg))
-    });
-
+    ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
     ipcRenderer.send('server_info');
-    ipcRenderer.on('server_info_reply', (event, arg) => {
-      this.server_info(arg)
-    });
+    ipcRenderer.on('server_info_reply', (event, arg) => { this.server_info(arg) });
   },
   methods: {
     server_info_memory(name, port) {
       var info = {};
-      var fileSize = '', fileArr = '';
-      var s_name = name;
-      var s_port = port;
-      console.log(s_name, s_port)
-
+      var s_name = name, s_port = port;
       var strArr = [], new_strArr = []
-      var tmp_ids = '', tmp = '', pid = '', tmp_size=''
-      var test = require('path').join(__dirname, './static/node_server/')
+      var fileSize = '', fileArr = '', tmp_ids = '', tmp = '', pid = '', tmp_size=''
+      var base = './static/node_server/'
+      var dir = require('path').join(__dirname, base)
+      var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
       try {
         const execSync = require('child_process').execSync;
-        const stdout = execSync('du -hs '+test+s_name);
+        const stdout = execSync('du -hs ' + dir_exec + s_name);
         fileSize = stdout.toString().trim()
         var tmp_filesize = fileSize.split('/')
         fileArr= tmp_filesize[0].split('\t')[0]
         info["size"]=fileArr
-
-      } catch (error) {
-        console.log(error)
-      }
+      } catch (error) { console.log(error)}
 
       try {
-        const stdout2 = execSync('lsof -iTCP:'+s_port);
+        const stdout2 = execSync('lsof -iTCP:' + s_port);
         tmp_ids = stdout2
-
       } catch (error) {
-        info["cpu"]="0.0"
-        info["memory"]="0.0M"
+        info["cpu"] = "0.0"
+        info["memory"] = "0.0M"
       }
-      if (tmp_ids == '') {
-            // alert('error: ' + err);
+      if (tmp_ids == '') { // alert('error: ' + err);
       } else {
             strArr = tmp_ids.split('\n')
             for (var i=0; i<strArr.length; i++) {
-              if(strArr[i] !== '') {
-                new_strArr.push(strArr[i])
-              }
+              if(strArr[i] !== '') { new_strArr.push(strArr[i]) }
             }
             tmp = new_strArr.pop()
             pid = tmp.split(' ')[1]
-            const stdout3 = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep '+pid);
+            const stdout3 = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep ' + pid);
             tmp_ids = stdout
-
             newArr = tmp_ids.split('\n')[0].split('  ')
             info["cpu"] = newArr.pop()
             info["memory"] = newArr.pop()
@@ -155,8 +140,7 @@ export default {
       var jsonFile = file;
       var jsonArr = []
       for (var i = 0; i < jsonFile.servers.length; i++) {
-        var item = {}
-        var perform = {}
+        var item = {}, perform = {}
         item["server_control"] = false
         item["server_name"] = jsonFile.servers[i].server_name
         item["server_port"] = jsonFile.servers[i].server_port
