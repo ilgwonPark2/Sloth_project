@@ -1,0 +1,14 @@
+{
+  "name": "node_server1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server_start.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io": "^2.2.0"
+  }
+}

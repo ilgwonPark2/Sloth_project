@@ -33,7 +33,6 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-  // const globalShortcut = app.globalShortcut
 
   globalShortcut.register('f5', function() {
     console.log('f5 is pressed')
@@ -105,7 +104,6 @@ ipcMain.on('server_start', (event, arg) => {
   const io = require('socket.io')(server)
   io.on('connection', (socketServer) => {
     socketServer.on('serverStop', () => {
-      // process.exit(0);
       server.close();
       console.log('server is termniated');
     });
@@ -127,10 +125,9 @@ ipcMain.on('server_stop', (event, arg) => {
   const socketClient = io.connect('http://localhost:' + jsonFile.servers[index].server_port);
   socketClient.on('connect', () => {
     socketClient.emit('serverStop');
-    setTimeout(() => {// process.exit(0);
-    }, 500);
+    // setTimeout(() => {// process.exit(0); }, 500);
   });
-  console.log('stopped ' + jsonFile.servers[index].server_port)
+  // console.log('stopped ' + jsonFile.servers[index].server_port)
 
 })
 
@@ -143,25 +140,21 @@ ipcMain.on('server_create', (event, arg) => {
   var dir = require('path').join(__dirname, base)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
 
-  child = exec("cp -r " + dir_exec + "node_server1 " + dir_exec + d_name, function(err, stdout, stderr) {
+  child = exec("cp -r " + dir_exec + "node_template " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
-          // console.log('exec error:' + err);
   });
 
-  var jb = {};
+  var jb = {}, obj = {}
   jb['server_name'] = arg.server_name
   jb['server_address'] = 'localhost'
   jb['server_port'] = parseInt(arg.server_port)
   jsonFile.servers.push(jb)
 
-  var obj = {};
   obj['servers'] = jsonFile.servers
   var json_str = JSON.stringify(obj, null, "\t")
   var fs = require('fs');
 
-  fs.writeFileSync(dir_exec + 'server_config.json', json_str, function(err) {
-    if (err) throw err;
-  });
+  fs.writeFileSync(dir_exec + 'server_config.json', json_str, function(err) { if (err) throw err; });
   event.returnValue = null
 })
 
@@ -175,7 +168,6 @@ ipcMain.on('server_remove', (event, arg) => {
 
   child = exec("rm -rf " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
-          // console.log('exec error: ' + err);
   });
 
   for (var i = 0; i < jsonFile.servers.length; i++)  if (d_name == jsonFile.servers[i].server_name) jsonFile.servers.splice(i, 1);
@@ -185,8 +177,5 @@ ipcMain.on('server_remove', (event, arg) => {
   var json_str = JSON.stringify(obj, null, "\t")
   var fs = require('fs');
 
-  fs.writeFile(dir_exec + "server_config.json", json_str, function(err) {
-    if (err) throw err;
-    console.log('Success');
-  });
+  fs.writeFile(dir_exec + "server_config.json", json_str, function(err) { if (err) throw err; });
 })
