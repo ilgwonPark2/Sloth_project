@@ -87,46 +87,58 @@ export default {
   },
   methods: {
     server_info_memory(name, port) {
-      var info = {};
-      var s_name = name, s_port = port;
+      var info = {}
+      var s_name = name, s_port = port
       var strArr = [], new_strArr = []
       var fileSize = '', fileArr = '', tmp_ids = '', tmp = '', pid = '', tmp_size=''
       var base = './static/node_server/'
       var dir = require('path').join(__dirname, base)
-      var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+      var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
+      // alert("server_info_memory function")
       const execSync = require('child_process').execSync
-      let stdout = execSync('du -hs ' + dir_exec + s_name)
+      let stdout = ''
       try {
         stdout = execSync('du -hs ' + dir_exec + s_name);
         fileSize = stdout.toString().trim()
         var tmp_filesize = fileSize.split('/')
         fileArr = tmp_filesize[0].split('\t')[0]
         info["size"] = fileArr
-      } catch (error) { console.log(error)}
+      } catch (error) {
+        // alert("error1: " + error)
+        console.log(error)
+      }
 
       try {
         stdout = execSync('lsof -iTCP:' + s_port);
         tmp_ids = String.fromCharCode.apply(null, stdout)
+        // alert("after lsof-iTCP tmp_ids: " + tmp_ids)
       } catch (error) {
         console.log("error:  "  + error)
+        // alert("error2: " + error)
         info["cpu"] = "0.0"
         info["memory"] = "0.0M"
       }
-      if (tmp_ids == '') { // alert('error: ' + err);
-      } else {
-          strArr = tmp_ids.split('\n')
-          for (var i=0; i<strArr.length; i++) {
-            if(strArr[i] !== '') { new_strArr.push(strArr[i]) }
-          }
-          tmp = new_strArr.pop()
-          pid = tmp.split(' ')[1]
-          stdout = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep ' + pid)
-          tmp_ids = String.fromCharCode.apply(null, stdout)
-          console.log(tmp_ids)
-          var newArr = tmp_ids.split('\n')[0].split('  ')
-          info["cpu"] = newArr.pop()
-          info["memory"] = newArr.pop()
-      }
+      try{
+        if (tmp_ids === '') {} // alert('error: ' + err);
+        else {
+            strArr = tmp_ids.split('\n')
+            // alert("strArr Exists? : " + strArr)
+            for (var i = 0; i < strArr.length; i++) {
+              if(strArr[i] !== '') { new_strArr.push(strArr[i]) }
+            }
+            tmp = new_strArr.pop()
+            pid = (process.env.NODE_ENV === 'development') ? tmp.split(' ')[1] : tmp.split(' ')[3]
+            // alert("ater tmp split : " + pid)
+            stdout = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep ' + pid)
+            // console.log(pid)
+            tmp_ids = String.fromCharCode.apply(null, stdout)
+            // console.log(tmp_ids)
+            var newArr = tmp_ids.split('\n')[0].split('  ')
+            info["cpu"] = newArr.pop()
+            info["memory"] = newArr.pop()
+        }
+      } catch (error) {}// alert("error3: " + error)
+
       return info;
     },
     server_info(file){
@@ -156,28 +168,27 @@ export default {
       if (this.items[index].server_control) ipcRenderer.send('server_stop', item.server_name);
       else ipcRenderer.send('server_start', item.server_name);
       this.items[index].server_control = !this.items[index].server_control;
+      setTimeout(() => { ipcRenderer.send('server_info') }, 500);
     },
     server_create(item) {
-      ipcRenderer.send('server_create', item);
-      ipcRenderer.send('server_info');
+      ipcRenderer.send('server_create', item)
+      ipcRenderer.send('server_info')
     },
     server_remove(item) {
-      if(item.server_control === true) this.server_toggle(item);
-      ipcRenderer.send('server_remove', item.server_name);
-      ipcRenderer.send('server_info');
+      if(item.server_control === true) this.server_toggle(item)
+      ipcRenderer.send('server_remove', item.server_name)
+      ipcRenderer.send('server_info')
     },
     server_controlAll(status){
       var param_toggle = (status === "start") ? 'server_start' : 'server_stop'
       this.items.forEach(function(item, arr) { ipcRenderer.send( param_toggle, item.server_name) })
-      setTimeout(() => {
-        ipcRenderer.send('server_info');
-      }, 500);
+      setTimeout(() => { ipcRenderer.send('server_info') }, 500);
     },
     server_status_check(server_port, idx){
       // Make a request for a user with a given ID
       axios.get('http://localhost:' + server_port)
-        .then(response => { this.items[idx].server_control = true; })
-        .catch(error => { this.items[idx].server_control = false;})
+        .then(response => { this.items[idx].server_control = true })
+        .catch(error => { this.items[idx].server_control = false })
     },
     find_elem(item_find) {
       var result;
