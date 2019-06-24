@@ -84,7 +84,7 @@ ipcMain.on('server_start', (event, arg) => {
   var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
   var command = (process.env.NODE_ENV === 'development') ?
     "node " + dir_exec + s_name + "/server_start.js":
-    dir_exec + "/../../../../../../../nodejs/bin/node " + dir_exec + base + s_name + "/server_start.js"
+    dir_exec + "/../../../../../../nodejs/bin/node " + dir_exec + base + s_name + "/server_start.js"
 
   child = exec(command, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
