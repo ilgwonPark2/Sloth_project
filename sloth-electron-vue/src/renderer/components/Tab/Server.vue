@@ -168,7 +168,7 @@ export default {
       if (this.items[index].server_control) ipcRenderer.send('server_stop', item.server_name);
       else ipcRenderer.send('server_start', item.server_name);
       this.items[index].server_control = !this.items[index].server_control;
-      setTimeout(() => { ipcRenderer.send('server_info') }, 500);
+      setTimeout(() => { ipcRenderer.send('server_info') }, 300);
     },
     server_create(item) {
       ipcRenderer.send('server_create', item)

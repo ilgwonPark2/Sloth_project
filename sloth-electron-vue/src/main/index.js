@@ -1,8 +1,8 @@
 import {
   app,
   BrowserWindow,
-  ipcMain,
-  globalShortcut
+  ipcMain
+  // ,globalShortcut
 } from 'electron'
 
 /**
@@ -33,15 +33,15 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-
-  globalShortcut.register('f5', function() {
-    console.log('f5 is pressed')
-    mainWindow.reload()
-  })
-  globalShortcut.register('CommandOrControl+R', function() {
-    console.log('CommandOrControl+R is pressed')
-    mainWindow.reload()
-  })
+  //
+  // globalShortcut.register('f5', function() {
+  //   console.log('f5 is pressed')
+  //   mainWindow.reload()
+  // })
+  // globalShortcut.register('CommandOrControl+R', function() {
+  //   console.log('CommandOrControl+R is pressed')
+  //   mainWindow.reload()
+  // })
 }
 
 app.on('ready', createWindow)
@@ -77,36 +77,19 @@ ipcMain.on('server_info', (event, arg) => {
 })
 
 ipcMain.on('server_start', (event, arg) => {
-  const express = require('express')
-  const http = require('http')
-  const app = express()
-  const server = http.createServer(app);
-
-  var jsonFile = require('../../static/node_server/server_config.json')
+  var exec = require('child_process').exec, child;
   const s_name = arg
-  var index = 0
-  for (var i = 0; i < jsonFile.servers.length; i++) {
-    if (jsonFile.servers[i].server_name == s_name) {
-      index = i
-      break;
-    }
-  }
-  app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token, X-Requested-With");
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-    next();
-  });
+  var base = './static/node_server/'
+  var dir = require('path').join(__dirname)
+  var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
+  var command = (process.env.NODE_ENV === 'development') ?
+    "node " + dir_exec + s_name + "/server_start.js":
+    dir_exec + "/../../../../../../../nodejs/bin/node " + dir_exec + base + s_name + "/server_start.js"
 
-  app.get('/', (req, res) => res.send('Hello World!'))
-  app.get('/test', (req, res) => res.send('test page, it is,' + jsonFile.servers[index].server_port))
-  server.listen(jsonFile.servers[index].server_port, () => console.log(`Example app listening on port ${jsonFile.servers[index].server_port }!`))
-  const io = require('socket.io')(server)
-  io.on('connection', (socketServer) => {
-    socketServer.on('serverStop', () => {
-      server.close();
-      console.log('server is termniated');
-    });
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+    if (stdout !== null) event.sender.send('stdout', stdout);
+    if (stderr !== null) event.sender.send('stderr', stderr);
   });
 })
 
@@ -124,10 +107,9 @@ ipcMain.on('server_stop', (event, arg) => {
 
   const socketClient = io.connect('http://localhost:' + jsonFile.servers[index].server_port);
   socketClient.on('connect', () => {
-    socketClient.emit('serverStop');
-    // setTimeout(() => {// process.exit(0); }, 500);
+    socketClient.emit('serverStop')
+    socketClient.close()
   });
-  // console.log('stopped ' + jsonFile.servers[index].server_port)
 
 })
 
