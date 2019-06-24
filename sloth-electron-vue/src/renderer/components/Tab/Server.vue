@@ -82,9 +82,12 @@ export default {
     }
   },
   mounted: function() {
-    ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
     this.server_refresh()
+    ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
     ipcRenderer.on('server_info_reply', (event, arg) => { this.server_info(arg) });
+
+    // refresh timer
+    setInterval(this.server_refresh, 10000);
   },
   methods: {
     server_info_memory(name, port) {
