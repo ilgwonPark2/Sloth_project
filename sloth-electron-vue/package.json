@@ -18,7 +18,7 @@
   },
   "build": {
     "productName": "Sloth",
-    "appId": "com.example.yourapp",
+    "appId": "com.seoultech.sloth",
     "asar": false,
     "directories": {
       "output": "build"
