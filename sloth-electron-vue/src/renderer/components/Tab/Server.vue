@@ -3,6 +3,7 @@
   <b-container style="margin-top:50px;">
     <b-row align-h="end">
       <b-button v-b-modal.node-server-create-modal pill variant="warning">New Node Server</b-button>
+      <b-button style="margin-left:15px;" pill variant="info" @click="server_refresh()">Refresh</b-button>
       <b-button style="margin-left:15px;" pill variant="success" @click="server_controlAll('start')">Start All</b-button>
       <b-button style="margin-left:15px;" pill variant="success" @click="server_controlAll('stop')">Stop All</b-button>
     </b-row>
@@ -82,7 +83,7 @@ export default {
   },
   mounted: function() {
     ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
-    ipcRenderer.send('server_info');
+    this.server_refresh()
     ipcRenderer.on('server_info_reply', (event, arg) => { this.server_info(arg) });
   },
   methods: {
@@ -168,19 +169,22 @@ export default {
       this.items[index].server_control = !this.items[index].server_control;
       setTimeout(() => { ipcRenderer.send('server_info') }, 500);
     },
+    server_refresh(){
+      ipcRenderer.send('server_info')
+    },
     server_create(item) {
       ipcRenderer.send('server_create', item)
-      ipcRenderer.send('server_info')
+      this.server_refresh()
     },
     server_remove(item) {
       if(item.server_control === true) this.server_toggle(item)
       ipcRenderer.send('server_remove', item.server_name)
-      ipcRenderer.send('server_info')
+      this.server_refresh()
     },
     server_controlAll(status){
       var param_toggle = (status === "start") ? 'server_start' : 'server_stop'
       this.items.forEach(function(item, arr) { ipcRenderer.send( param_toggle, item.server_name) })
-      setTimeout(() => { ipcRenderer.send('server_info') }, 500);
+      setTimeout(() => { this.server_refresh() }, 500);
     },
     server_status_check(server_port, idx){
       // Make a request for a user with a given ID
