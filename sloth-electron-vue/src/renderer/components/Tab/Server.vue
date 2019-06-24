@@ -87,58 +87,56 @@ export default {
   },
   methods: {
     server_info_memory(name, port) {
-      var info = {}
       var s_name = name, s_port = port
-      var strArr = [], new_strArr = []
-      var fileSize = '', fileArr = '', tmp_ids = '', tmp = '', pid = '', tmp_size=''
       var base = './static/node_server/'
       var dir = require('path').join(__dirname, base)
       var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
+      let info = {}
+      info["cpu"] = "0.0 "
+      info["memory"] = "0.0M"
+      let pid_list = []
+      let fileSize = '', fileArr = '', tmp_ids = '', tmp = '',
+          pid = '', tmp_size='', stdout = ''
       // alert("server_info_memory function")
       const execSync = require('child_process').execSync
-      let stdout = ''
       try {
         stdout = execSync('du -hs ' + dir_exec + s_name);
         fileSize = stdout.toString().trim()
         var tmp_filesize = fileSize.split('/')
         fileArr = tmp_filesize[0].split('\t')[0]
         info["size"] = fileArr
-      } catch (error) {
-        // alert("error1: " + error)
-        console.log(error)
-      }
+      } catch (error) { console.log(error) }
 
       try {
+        console.log(s_port)
         stdout = execSync('lsof -iTCP:' + s_port);
         tmp_ids = String.fromCharCode.apply(null, stdout)
-        // alert("after lsof-iTCP tmp_ids: " + tmp_ids)
-      } catch (error) {
-        console.log("error:  "  + error)
-        // alert("error2: " + error)
-        info["cpu"] = "0.0"
-        info["memory"] = "0.0M"
-      }
-      try{
-        if (tmp_ids === '') {} // alert('error: ' + err);
-        else {
-            strArr = tmp_ids.split('\n')
-            // alert("strArr Exists? : " + strArr)
-            for (var i = 0; i < strArr.length; i++) {
-              if(strArr[i] !== '') { new_strArr.push(strArr[i]) }
-            }
-            tmp = new_strArr.pop()
-            pid = (process.env.NODE_ENV === 'development') ? tmp.split(' ')[1] : tmp.split(' ')[3]
-            // alert("ater tmp split : " + pid)
-            stdout = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep ' + pid)
-            // console.log(pid)
-            tmp_ids = String.fromCharCode.apply(null, stdout)
-            // console.log(tmp_ids)
-            var newArr = tmp_ids.split('\n')[0].split('  ')
-            info["cpu"] = newArr.pop()
-            info["memory"] = newArr.pop()
-        }
-      } catch (error) {}// alert("error3: " + error)
+        console.log(tmp_ids)
+      } catch (error) { console.log("error:  "  + error) }
 
+      try{
+        if (tmp_ids === '') { } // alert('error: ' + err);
+        else {
+          pid_list = tmp_ids.split("\n")
+          for (var i = 0; i < pid_list.length; i++) {
+            if(pid_list[i].includes("LISTEN")) {
+              pid_list = pid_list[i].split(" ")
+              break
+            }
+          }
+          for (var i = 0; i < pid_list.length; i++) {
+            if(Number.isInteger(parseInt(pid_list[i]))) {
+              pid = pid_list[i]
+              break
+            }
+          }
+          stdout = execSync('ps -eo pid,rss,vsize,pmem,pcpu | grep ' + pid)
+          tmp_ids = String.fromCharCode.apply(null, stdout)
+          var performance = tmp_ids.split('  ')
+          info["cpu"] = performance.pop()
+          info["memory"] = performance.pop() + "M"
+        }
+      } catch (error) {}
       return info;
     },
     server_info(file){
@@ -168,7 +166,7 @@ export default {
       if (this.items[index].server_control) ipcRenderer.send('server_stop', item.server_name);
       else ipcRenderer.send('server_start', item.server_name);
       this.items[index].server_control = !this.items[index].server_control;
-      setTimeout(() => { ipcRenderer.send('server_info') }, 300);
+      setTimeout(() => { ipcRenderer.send('server_info') }, 500);
     },
     server_create(item) {
       ipcRenderer.send('server_create', item)

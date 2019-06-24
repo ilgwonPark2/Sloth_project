@@ -79,17 +79,20 @@ ipcMain.on('server_info', (event, arg) => {
 ipcMain.on('server_start', (event, arg) => {
   var exec = require('child_process').exec, child;
   const s_name = arg
-  var base = './static/node_server/'
+  var base = '/static/node_server/'
   var dir = require('path').join(__dirname)
   var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
   var command = (process.env.NODE_ENV === 'development') ?
-    "node " + dir_exec + s_name + "/server_start.js":
+    "node ." + dir_exec + s_name + "/server_start.js":
     dir_exec + "/../../../../../../nodejs/bin/node " + dir_exec + base + s_name + "/server_start.js"
 
   child = exec(command, function(err, stdout, stderr) {
-    if (err !== null) event.sender.send('Error', err);
-    if (stdout !== null) event.sender.send('stdout', stdout);
-    if (stderr !== null) event.sender.send('stderr', stderr);
+    // if (err !== null) event.sender.send('Error', err);
+    // if (stdout !== null) event.sender.send('Error', stdout);
+    // if (stderr !== null) event.sender.send('Error', stderr);
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
   });
 })
 
