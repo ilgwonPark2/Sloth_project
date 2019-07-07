@@ -32,19 +32,43 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null
+    stopNpm()
   })
-  //
-  // globalShortcut.register('f5', function() {
-  //   console.log('f5 is pressed')
-  //   mainWindow.reload()
-  // })
-  // globalShortcut.register('CommandOrControl+R', function() {
-  //   console.log('CommandOrControl+R is pressed')
-  //   mainWindow.reload()
-  // })
+}
+
+function startNpm() {
+  var exec = require("child_process").exec, child;
+  var base = './node_modules/npm-gui'
+  var dir = require('path').join(__dirname, base)
+  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+  var d_name = "index.js"
+  console.log(dir_exec);
+
+  // +  dir_exec + d_name
+  child = exec("node node_modules/npm-gui/index.js" , function(err, stdout, stderr) {
+    if (err !== null) console.log('Error', err);
+  });
+}
+
+function stopNpm() {
+  let fileSize = '', fileArr = '', stdout = ''
+  // alert("server_info_memory function")
+  const execSync = require('child_process').execSync
+  try {
+    stdout = execSync('ps -ef | grep index.js');
+    fileSize = stdout.toString().trim()
+    var tmp_filesize = fileSize.split('/')
+    fileArr = tmp_filesize[0].split('  ')[1]
+  } catch (error) { console.log(error) }
+
+  try {
+    stdout = execSync('kill -9 ' + fileArr);
+  } catch (error) { console.log("error:  "  + error) }
 }
 
 app.on('ready', createWindow)
+app.on('ready', startNpm)
+app.on('ready', stopNpm)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -55,9 +79,10 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
+    startNpm()
+
   }
 })
-
 
 
 
@@ -164,3 +189,30 @@ ipcMain.on('server_remove', (event, arg) => {
 
   fs.writeFile(dir_exec + "server_config.json", json_str, function(err) { if (err) throw err; });
 })
+
+
+// ipcMain.on('start_npm_gui', (event) => {
+//   var exec = require("child_process").exec, child;
+//   var base = './node_modules/npm-gui'
+//   var dir = require('path').join(__dirname, base)
+//   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+//   var d_name = "index.js"
+//   console.log(dir_exec);
+
+//   // +  dir_exec + d_name
+//   child = exec("node node_modules/npm-gui/index.js" , function(err, stdout, stderr) {
+//     if (err !== null) event.sender.send('Error', err);
+//   });
+
+// // })
+
+// ipcMain.on('stop_npm_gui', (event) => {
+//   const io = require('socket.io-client');
+
+//   const socketClient = io.connect('http://localhost:1337');
+//   socketClient.on('connect', () => {
+//     socketClient.emit('serverStop')
+//     socketClient.close()
+//   });
+
+// })
