@@ -32,43 +32,43 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null
-    stopNpm()
+    // stopNpm()
   })
 }
 
 function startNpm() {
   var exec = require("child_process").exec, child;
-  var base = './node_modules/npm-gui'
+  var base = './node_modules/npm-gui/'
   var dir = require('path').join(__dirname, base)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
   var d_name = "index.js"
   console.log(dir_exec);
 
   // +  dir_exec + d_name
-  child = exec("node node_modules/npm-gui/index.js" , function(err, stdout, stderr) {
+  child = exec("node " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) console.log('Error', err);
   });
 }
 
-function stopNpm() {
-  let fileSize = '', fileArr = '', stdout = ''
-  // alert("server_info_memory function")
-  const execSync = require('child_process').execSync
-  try {
-    stdout = execSync('ps -ef | grep index.js');
-    fileSize = stdout.toString().trim()
-    var tmp_filesize = fileSize.split('/')
-    fileArr = tmp_filesize[0].split('  ')[1]
-  } catch (error) { console.log(error) }
+// function stopNpm() {
+//   let fileSize = '', fileArr = '', stdout = ''
+//   // alert("server_info_memory function")
+//   const execSync = require('child_process').execSync
+//   try {
+//     stdout = execSync('ps -ef | grep index.js');
+//     fileSize = stdout.toString().trim()
+//     var tmp_filesize = fileSize.split('/')
+//     fileArr = tmp_filesize[0].split('  ')[1]
+//   } catch (error) { console.log(error) }
 
-  try {
-    stdout = execSync('kill -9 ' + fileArr);
-  } catch (error) { console.log("error:  "  + error) }
-}
+//   try {
+//     stdout = execSync('kill -9 ' + fileArr);
+//   } catch (error) { console.log("error:  "  + error) }
+// }
 
 app.on('ready', createWindow)
 app.on('ready', startNpm)
-app.on('ready', stopNpm)
+// app.on('ready', stopNpm)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
