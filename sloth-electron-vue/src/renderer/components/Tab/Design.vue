@@ -1,48 +1,64 @@
 <template>
-  <div class="">
+  <div class="" style="height:88vh;">
+    <paginate  name="items" :list="items" :per="4" class="text-center">
+      <li class="col-sm-6" v-for="item in paginated('items')" style="list-style: none; padding:30px">
+        <b-img-lazy :src="'https://templated.co/items/thumbnails/'+item + '.jpg'" alt="item" style="width:43%;"></b-img-lazy>
+      </li>
+    </paginate>
 
-    <b-table
-      id="my-table"
-      :items="items"
-      :per-page="perPage"
-      :current-page="currentPage"
-      small
-    ></b-table>
-
-
-    <p class="mt-3">Current Page: {{ currentPage }}</p>
-    <b-pagination
-      v-model="currentPage"
-      :total-rows="rows"
-      :per-page="perPage"
-      aria-controls="my-table"
-    ></b-pagination>
+    <div @click="scrollToTop()" class="text-center" >
+      <paginate-links for="items" :limit="3"
+      class="pagination justify-content-center"
+      :show-step-links="true"
+      :step-links="{next: 'Next »', prev: '« Prev'}"
+      ></paginate-links>
+    </div>
   </div>
+
+
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        perPage: 3,
-        currentPage: 1,
-        items: [
-          { id: 1, first_name: 'Fred', last_name: 'Flintstone' },
-          { id: 2, first_name: 'Wilma', last_name: 'Flintstone' },
-          { id: 3, first_name: 'Barney', last_name: 'Rubble' },
-          { id: 4, first_name: 'Betty', last_name: 'Rubble' },
-          { id: 5, first_name: 'Pebbles', last_name: 'Flintstone' },
-          { id: 6, first_name: 'Bamm Bamm', last_name: 'Rubble' },
-          { id: 7, first_name: 'The Great', last_name: 'Gazzoo' },
-          { id: 8, first_name: 'Rockhead', last_name: 'Slate' },
-          { id: 9, first_name: 'Pearl', last_name: 'Slaghoople' }
-        ]
-      }
-    },
-    computed: {
-      rows() {
-        return this.items.length
-      }
+export default {
+  data() {
+    return {
+      paginate: ['items'],
+      items: [
+        "hielo", "industrious", "snapshot", "roadtrip",
+        "urban", "broadcast", "projection", "intensify",
+        "theory", "fullmotion", "binary", "introspect",
+        "radius", "epilogue", "prism", "typify",
+        "retrospect", "spatial", "grassygrass", "assembly",
+        "undeviating", "barbedflower", "lorikeet", "widerange"
+      ],
+      links: [
+        "https://templated.co/hielo",
+        "https://templated.co/industrious",
+        "https://templated.co/snapshot",
+        "https://templated.co/roadtrip",
+        "https://templated.co/urban",
+        "https://templated.co/broadcast",
+        "https://templated.co/projection",
+        "https://templated.co/intensify",
+      ]
+    }
+  },
+  computed: {
+    rows() {
+      return this.items.length
+    }
+  },
+  mounted: {
+    mounted () {
+      setTimeout(() => {
+        this.shown = true
+    }, 1000)
+    }
+  },
+  methods:{
+    scrollToTop: function() {
+      window.scrollTo(0, 0);
     }
   }
+}
 </script>

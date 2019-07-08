@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
+import VuePaginate from 'vue-paginate'
 
 Vue.use(BootstrapVue)
+Vue.use(VuePaginate)
 
 import axios from 'axios'
 
@@ -18,7 +20,8 @@ Vue.config.productionTip = false
 
 // css files below...
 import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import '../../static/style/bootstrap.min.css'
+// import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../../static/style/font-awesome.min.css'
 
 /* eslint-disable no-new */
