@@ -20,8 +20,8 @@ Vue.config.productionTip = false
 
 // css files below...
 import 'bootstrap/dist/css/bootstrap.css'
-import '../../static/style/bootstrap.min.css'
-// import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+import '../../static/style/style.css'
 import '../../static/style/font-awesome.min.css'
 
 /* eslint-disable no-new */

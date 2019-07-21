@@ -1,16 +1,16 @@
 <template>
   <div class="" style="height:88vh;">
-    <paginate  name="items" :list="items" :per="4" class="text-center">
-      <li class="col-sm-6" v-for="item in paginated('items')" style="list-style: none; padding:30px">
-        <b-img-lazy :src="'https://templated.co/items/thumbnails/'+item + '.jpg'" alt="item" style="width:43%;"></b-img-lazy>
-      </li>
+    <paginate name="items" :list="items" :per="4" class="text-center">
+      <div>
+        <b-img-lazy class="col-sm-6" v-for="item in paginated('items')"  :src="'https://templated.co/items/thumbnails/'+item + '.jpg'" alt="item" style="margin:30px; width:35%;"></b-img-lazy>
+      </div>
     </paginate>
 
     <div @click="scrollToTop()" class="text-center" >
-      <paginate-links for="items" :limit="3"
-      class="pagination justify-content-center"
+      <paginate-links for="items" :limit="2"
+      class="pagination pagination-md justify-content-center pagaination-sloth"
       :show-step-links="true"
-      :step-links="{next: 'Next »', prev: '« Prev'}"
+      :step-links="{next: ' »', prev: '« '}"
       ></paginate-links>
     </div>
   </div>

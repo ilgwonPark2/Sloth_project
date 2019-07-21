@@ -1,0 +1,17 @@
+.pagaination-sloth > li > a {
+  position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.pagaination-sloth > li > a:hover {
+    background-color: lightgrey;
+    cursor: default;
+    color: rgb(112, 174, 71) !important;
+    font-weight: 600;
+}
