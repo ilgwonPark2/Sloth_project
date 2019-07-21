@@ -2,6 +2,7 @@ const express = require('express')
 const http = require('http')
 const app = express()
 const server = http.createServer(app);
+const path = require("path");
 
 var jsonFile = require('../server_config.json')
 var s_name_list = __dirname.split('/')
@@ -22,8 +23,11 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
   next();
 });
+app.use('/assets', express.static(path.join(__dirname, '/assets')))
+app.use('/images', express.static(path.join(__dirname, '/images')))
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.get('/', (req, res) => res.sendFile(path.join(__dirname + '/index.html')))
+app.get('*', (req, res) => res.sendFile(path.join(__dirname + req.path)))
 app.get('/test', (req, res) => res.send('test page, it is,' + jsonFile.servers[index].server_port))
 server.listen(jsonFile.servers[index].server_port, () => console.log(`Example app listening on port ${jsonFile.servers[index].server_port }!`))
 const io = require('socket.io')(server)

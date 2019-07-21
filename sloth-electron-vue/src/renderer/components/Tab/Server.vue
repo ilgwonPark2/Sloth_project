@@ -83,6 +83,7 @@ export default {
     }
   },
   mounted: function() {
+    this.server_refresh()
     this.timer = this.server_refresh()
     ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
     ipcRenderer.on('server_info_reply', (event, arg) => { this.server_info(arg) });
@@ -91,7 +92,7 @@ export default {
     setInterval(this.server_refresh, 15000);
   },
   beforeDestroy() {
-  clearInterval(this.timer)
+    clearInterval(this.timer)
   },
   methods: {
     server_info_memory(name, port) {
