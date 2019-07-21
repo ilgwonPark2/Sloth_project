@@ -96,7 +96,7 @@ app.on('activate', () => {
 
 
 ipcMain.on('server_info', (event, arg) => {
-  var jsonFile = require('../../static/node_server/server_config.json')
+  var jsonFile = read_server_config()
   event.sender.send('server_info_reply', jsonFile);
 })
 
@@ -122,7 +122,7 @@ ipcMain.on('server_start', (event, arg) => {
 
 ipcMain.on('server_stop', (event, arg) => {
   const io = require('socket.io-client');
-  var jsonFile = require('../../static/node_server/server_config.json')
+  var jsonFile = read_server_config()
   const s_name = arg
   var index = 0
   for (var i = 0; i < jsonFile.servers.length; i++) {
@@ -141,15 +141,18 @@ ipcMain.on('server_stop', (event, arg) => {
 })
 
 ipcMain.on('server_create', (event, arg) => {
-  // console.log("server: receives" + arg.server_port) // prints "ping"
   var exec = require('child_process').exec, child;
   var d_name = arg.server_name
-  var jsonFile = require('../../static/node_server/server_config.json')
   var base = './static/node_server/'
   var dir = require('path').join(__dirname, base)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+  var jsonFile = read_server_config()
+  var fs = require('fs');
 
-  child = exec("cp -r " + dir_exec + "node_template " + dir_exec + d_name, function(err, stdout, stderr) {
+  child = exec("mkdir " + dir_exec + d_name, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+  });
+  child = exec("cp " + dir_exec + "node_template/* " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
   });
 
@@ -161,19 +164,18 @@ ipcMain.on('server_create', (event, arg) => {
 
   obj['servers'] = jsonFile.servers
   var json_str = JSON.stringify(obj, null, "\t")
-  var fs = require('fs');
-
   fs.writeFileSync(dir_exec + 'server_config.json', json_str, function(err) { if (err) throw err; });
   event.returnValue = null
 })
 
 ipcMain.on('server_remove', (event, arg) => {
   var exec = require("child_process").exec, child;
-  var jsonFile = require('../../static/node_server/server_config.json')
+  var jsonFile = read_server_config()
   var d_name = arg
   var base = './static/node_server/'
   var dir = require('path').join(__dirname, base)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+  var fs = require('fs');
 
   child = exec("rm -rf " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
@@ -184,9 +186,39 @@ ipcMain.on('server_remove', (event, arg) => {
   var obj = {};
   obj['servers'] = jsonFile.servers
   var json_str = JSON.stringify(obj, null, "\t")
-  var fs = require('fs');
+  fs.writeFileSync(dir_exec + 'server_config.json', json_str, function(err) { if (err) throw err; });
+})
 
-  fs.writeFile(dir_exec + "server_config.json", json_str, function(err) { if (err) throw err; });
+ipcMain.on('apply_design', (event, arg) => {
+  console.log('apply_design '+ arg)
+
+  var fs = require('fs');
+  var url = require('url');
+  var exec = require('child_process').exec, child;
+
+  var d_name = arg[1]
+  var base = './static/node_server/'
+  var dir = require('path').join(__dirname, base)
+  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+  // console.log(dir)
+  // console.log(base)
+  var DOWNLOAD_DIR = "https://templated.co/" + arg[0] +"/download"
+  var wget = 'wget -O ' + dir_exec + d_name + '/template.tar.gz ' +  DOWNLOAD_DIR
+
+ var child = exec(wget, function(err, stdout, stderr) {
+   if (err) throw err;
+   else console.log(DOWNLOAD_DIR + ' downloaded to ' + dir_exec + d_name);
+ });
+
+setTimeout( () => {
+  var tar = 'cd '+ dir_exec + d_name +' && tar -xvzf ./template.tar.gz && rm -rf ./template.tar.gz'
+  console.log(tar)
+   var child = exec(tar, function(err, stdout, stderr) {
+     if (err) throw err;
+     else console.log('tar tar');
+   });
+}, 7000);
+event.sender.send('apply_design_reply', '');
 })
 
 
@@ -215,3 +247,17 @@ ipcMain.on('server_remove', (event, arg) => {
 //   });
 
 // })
+
+
+
+
+
+function read_server_config(){
+  var fs = require('fs');
+  var base = './static/node_server/'
+  var dir = require('path').join(__dirname, base)
+  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+  var jsonFile = fs.readFileSync(dir_exec + 'server_config.json');
+  jsonFile = JSON.parse(jsonFile)
+  return jsonFile
+}
