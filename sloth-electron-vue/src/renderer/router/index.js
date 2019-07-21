@@ -5,6 +5,7 @@ import Sloth_MySQL from '@/components/Tab/MySQL'
 import Sloth_NPM from '@/components/Tab/NPM'
 import Sloth_Design from '@/components/Tab/Design'
 import Sloth_Server from '@/components/Tab/Server'
+import Sloth_Boiler from '@/components/Tab/Boiler'
 import Header from '@/components/Shared/header.vue'
 import Footer from '@/components/Shared/footer.vue'
 
@@ -57,6 +58,16 @@ export default new Router({
       name: 'menu-design',
       components: {
         default: Sloth_Design,
+        header: Header,
+        footer: Footer
+
+      }
+    },
+    {
+      path: '/boiler',
+      name: 'menu-boiler',
+      components: {
+        default: Sloth_Boiler,
         header: Header,
         footer: Footer
 
