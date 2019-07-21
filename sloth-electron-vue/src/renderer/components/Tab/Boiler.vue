@@ -1,41 +1,53 @@
 <template>
   <div style="height:88vh;">
-    <!-- <div class="buttons">
-        <span>sort</span>
-        <button v-for="b in sort" v-bind:title="b.title" 
-        v-bind:class="sortType == b.class?'selected':''"
-        v-on:click="toggleList('sort',b.class)">
-        <i class="fas" v-bind:class="'fa-'+b.class"></i>
-        </button>
-    </div> -->
-    <!--   -->
-    <b-list-group style="width:75%; margin-top:50px; margin-left:auto; margin-right:auto;">
-      <b-list-group-item variant="light" v-for="(item, index) in items" v-bind:key="index" style="margin-top=10vh;" >
+
+    <!-- <b-list-group style="width:75%; margin-top:50px; margin-left:auto; margin-right:auto;">
+      <b-list-group-item variant="light" v-for="(item, index) in items" v-bind:key="index" style="margin-top=10vh;" >          
           <div class="img">
             <b-img left v-bind:src="item.img" v-bind:alt="item.name" rounded="Rounded image" style="margin-top=10%; width:9%; height:13%"></b-img>
           </div>
           <div class="content" @click="Golink(item.name, item.link)">
             <h4 style="width=15px; margin-left:10%;">{{item.name}}</h4>
+            <p class="mb-1" style="margin-left:10%;">{{item.content}}</p>
           </div>
-          <p class="mb-1" style="margin-left:10%;">{{item.content}}</p>
+
           <hr>
-          <b-list-group horizontal>
-            <!-- Place this tag where you want the button to render. -->
-            <!-- <a class="github-button" href="https://github.com/ntkme/github-buttons/fork" data-icon="octicon-repo-forked" data-show-count="true" aria-label="Fork ntkme/github-buttons on GitHub">Fork</a> -->
-            <!-- <github-button href="https://github.com/ntkme">Follow @ntkme</github-button> -->
-            <!-- <b-badge style="margin-left:10%;" variant="success" pill>Watch: {{item.watch}}</b-badge>
-            <b-badge style="margin-left:5px;" variant="success" pill>Star: {{item.star}} </b-badge>
-            <b-badge style="margin-left:5px;" variant="success" pill>Fork: {{item.fork}}</b-badge> -->
-            <iframe style="margin-left:10%" v-bind:src="item.fork" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
-            <iframe style="margin-left:10%" v-bind:src="item.star"  frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
-            <iframe style="margin-left:10%" v-bind:src="item.watch" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
+          <b-list-group style="margin-left:10%" vertical >
+            <iframe v-bind:src="item.fork" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
+            <iframe v-bind:src="item.star"  frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
+            <iframe v-bind:src="item.watch" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
 
           </b-list-group>
-        <!-- <div class="content" style="margin-top=10%;">
-          
-        </div> -->
       </b-list-group-item>
-    </b-list-group>
+    </b-list-group> -->
+
+
+    <b-list-group style="width:75%; margin-top:50px; margin-left:auto; margin-right:auto;">
+      <b-list-group-item variant="light" v-for="(item, index) in items" v-bind:key="index" style="display:inline-block; padding:10px;" >          
+          <table style="width:100%">
+            <tr> 
+              <td width="20%">
+                <b-img left v-bind:src="item.img" v-bind:alt="item.name" rounded="Rounded image" style="margin-top=10%; width:100px; height:120px"></b-img>
+              </td>
+              <td width="60%">
+                <h4 style="width=15px; margin-left:10%;">{{item.name}}</h4>
+                <p style="margin-left:10%;"> {{item.content}}</p>
+              </td>
+              <td width="20%"> 
+                <b-list-group style="margin-left:10%" vertical >
+                <iframe v-bind:src="item.fork" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
+                <iframe v-bind:src="item.star"  frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
+                <iframe v-bind:src="item.watch" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
+                </b-list-group>
+              </td>
+            </tr>
+          </table>
+          <hr>
+          <b-button style= "width:75%; margin-left:15%; margin-right:auto;" variant="success" @click="Golink(item.name, item.link)">More Detail +</b-button>
+
+      </b-list-group-item>
+    </b-list-group>    
+          
 
   </div>
 </template>
@@ -47,6 +59,7 @@ export default {
       items: [
         {
           name: 'sahat',
+          repo: 'hackathon-starter',
           content: 'A boilerplate for Node.js web applications', 
           watch: 'https://ghbtns.com/github-btn.html?user=sahat&repo=hackathon-starter&type=watch&count=true&v=2',
           star: 'https://ghbtns.com/github-btn.html?user=sahat&repo=hackathon-starter&type=star&count=true',
@@ -55,7 +68,8 @@ export default {
           link: 'https://github.com/sahat/hackathon-starter'
           },
         {
-          name: 'alexa',          
+          name: 'alexa ',          
+          repo: 'alexa-skills-kit-sdk-for-nodejs',
           content: 'The Alexa Skills Kit SDK for Node.js helps you get a skill up and running quickly, letting you focus on skill logic instead of boilerplate code.', 
           watch: 'https://ghbtns.com/github-btn.html?user=alexa&repo=alexa-skills-kit-sdk-for-nodejs&type=watch&count=true&v=2',
           star: 'https://ghbtns.com/github-btn.html?user=alexa&repo=alexa-skills-kit-sdk-for-nodejs&type=star&count=true',
@@ -65,6 +79,7 @@ export default {
           },
         {
           name: 'kriasoft',
+          repo: 'nodejs-api-starter',
           watch: 'https://ghbtns.com/github-btn.html?user=kriasoft&repo=nodejs-api-starter&type=watch&count=true&v=2',
           star: 'https://ghbtns.com/github-btn.html?user=kriasoft&repo=nodejs-api-starter&type=star&count=true',
           fork: 'https://ghbtns.com/github-btn.html?user=kriasoft&repo=nodejs-api-starter&type=fork&count=true',
@@ -73,7 +88,8 @@ export default {
           img: "https://kriasoft.githubusercontent.com/u/544954?v=4"
           },
         {
-          name: 'icebob',          
+          name: 'icebob ',          
+          repo: 'vue-express-mongo-boilerplate',
           watch: 'https://ghbtns.com/github-btn.html?user=icebob&repo=vue-express-mongo-boilerplate&type=watch&count=true&v=2',
           star: 'https://ghbtns.com/github-btn.html?user=icebob&repo=vue-express-mongo-boilerplate&type=star&count=true',
           fork: 'https://ghbtns.com/github-btn.html?user=icebob&repo=vue-express-mongo-boilerplate&type=fork&count=true',
@@ -82,7 +98,8 @@ export default {
           img: "https://avatars0.githubusercontent.com/u/306521?s=400&v=4"
         },
         {
-          name: 'FredericHeem',
+          name: 'FredericHeem ',
+          repo: 'starhackit',
           watch: 'https://ghbtns.com/github-btn.html?user=FredericHeem&repo=starhackit&type=watch&count=true&v=2',
           star: 'https://ghbtns.com/github-btn.html?user=FredericHeem&repo=starhackit&type=star&count=true',
           fork: 'https://ghbtns.com/github-btn.html?user=FredericHeem&repo=starhackit&type=fork&count=true', 
