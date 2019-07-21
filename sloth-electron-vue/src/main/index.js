@@ -190,33 +190,33 @@ ipcMain.on('server_remove', (event, arg) => {
 })
 
 ipcMain.on('apply_design', (event, arg) => {
-  console.log('apply_design '+ arg)
-
-  var fs = require('fs');
-  var url = require('url');
+  var wget = require('wget')
   var exec = require('child_process').exec, child;
-
   var d_name = arg[1]
   var base = './static/node_server/'
   var dir = require('path').join(__dirname, base)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
-  // console.log(dir)
-  // console.log(base)
-  var DOWNLOAD_DIR = "https://templated.co/" + arg[0] +"/download"
-  var wget = 'wget -O ' + dir_exec + d_name + '/template.tar.gz ' +  DOWNLOAD_DIR
+  var DOWNLOAD_DIR = "https://templated.co/" + arg[0] + "/download"
 
- var child = exec(wget, function(err, stdout, stderr) {
-   if (err) throw err;
-   else console.log(DOWNLOAD_DIR + ' downloaded to ' + dir_exec + d_name);
- });
+  var output = dir_exec + d_name + "/template.tar.gz"
+  var options = {};
+  var download = wget.download(DOWNLOAD_DIR, output, options);
+  download.on('error', function(err) {
+      console.log(err);
+  });
+  download.on('end', function(output) {
+      console.log(output);
+  });
+  download.on('progress', function(progress) {
+  });
 
 setTimeout( () => {
   var tar = 'cd '+ dir_exec + d_name +' && tar -xvzf ./template.tar.gz && rm -rf ./template.tar.gz'
   console.log(tar)
-   var child = exec(tar, function(err, stdout, stderr) {
-     if (err) throw err;
-     else console.log('tar tar');
-   });
+  child = exec(tar, function(err, stdout, stderr) {
+   if (err) throw err;
+   else console.log('tar tar');
+  });
 }, 7000);
 event.sender.send('apply_design_reply', '');
 })
