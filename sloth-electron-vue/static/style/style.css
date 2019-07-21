@@ -15,3 +15,11 @@
     color: rgb(112, 174, 71) !important;
     font-weight: 600;
 }
+
+.card-columns.card-sloth{
+      column-count: 2 !important;
+}
+
+.card-text.card-text-sloth{
+  margin-top:50%;
+}
