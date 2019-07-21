@@ -21,9 +21,16 @@
       </b-list-group-item>
     </b-list-group> -->
 
-
-    <b-list-group style="width:75%; margin-top:50px; margin-left:auto; margin-right:auto;">
-      <b-list-group-item variant="light" v-for="(item, index) in items" v-bind:key="index" style="display:inline-block; padding:10px;" >          
+    <!-- <div class="buttons">
+      <table style="margin-left:85%; margin-top:10px;">
+      <tr>
+        <td><b-button variant="info" @click="Golink(item.name, item.link)">Star</b-button></td>
+        <td><b-button variant="info" @click="Golink(item.name, item.link)">Fork</b-button></td>
+      </tr>
+      </table>
+    </div> -->
+    <b-list-group style="width:80%; margin-top:40px; margin-left:auto; margin-right:auto;">
+      <b-list-group-item variant="light" v-for="(item, index) in items" v-bind:key="index" style="display:inline-block; padding:10px; height:220px;" >          
           <table style="width:100%">
             <tr> 
               <td width="20%">
@@ -35,20 +42,20 @@
               </td>
               <td width="20%"> 
                 <b-list-group style="margin-left:10%" vertical >
-                <iframe v-bind:src="item.fork" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
                 <iframe v-bind:src="item.star"  frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
+                <iframe v-bind:src="item.fork" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
                 <iframe v-bind:src="item.watch" frameborder="0" scrolling="0" width="150px" height="30px"></iframe>
                 </b-list-group>
               </td>
             </tr>
+            <tr>
+              <th colspan=3>
+              <hr>
+              <b-button style= "width:70%; margin-left:15%; margin-top:0%;" variant="success" @click="Golink(item.name, item.link)">More Detail +</b-button></th>
+            </tr>
           </table>
-          <hr>
-          <b-button style= "width:75%; margin-left:15%; margin-right:auto;" variant="success" @click="Golink(item.name, item.link)">More Detail +</b-button>
-
       </b-list-group-item>
-    </b-list-group>    
-          
-
+    </b-list-group>
   </div>
 </template>
 
@@ -76,16 +83,6 @@ export default {
           fork: 'https://ghbtns.com/github-btn.html?user=alexa&repo=alexa-skills-kit-sdk-for-nodejs&type=fork&count=true',
           img: "https://avatars3.githubusercontent.com/u/27459759?s=400&v=4",
           link: 'https://github.com/alexa/alexa-skills-kit-sdk-for-nodejs'
-          },
-        {
-          name: 'kriasoft',
-          repo: 'nodejs-api-starter',
-          watch: 'https://ghbtns.com/github-btn.html?user=kriasoft&repo=nodejs-api-starter&type=watch&count=true&v=2',
-          star: 'https://ghbtns.com/github-btn.html?user=kriasoft&repo=nodejs-api-starter&type=star&count=true',
-          fork: 'https://ghbtns.com/github-btn.html?user=kriasoft&repo=nodejs-api-starter&type=fork&count=true',
-          content: 'Boilerplate and tooling for authoring data API backends with Node.js and GraphQL',          
-          link: 'https://github.com/kriasoft/nodejs-api-starter',
-          img: "https://kriasoft.githubusercontent.com/u/544954?v=4"
           },
         {
           name: 'icebob ',          
