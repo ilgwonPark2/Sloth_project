@@ -129,7 +129,7 @@ export default {
       // ipcRenderer.send('clear_design', [this.template, item]);
       ipcRenderer.send('server_remove', item.server_name)
       setTimeout(() => ipcRenderer.send('server_create', item), 3000)
-      setTimeout(() => ipcRenderer.send('server_start', item.server_name),3000)
+      setTimeout(() => ipcRenderer.send('server_start', item.server_name), 3000)
 
     }
   }

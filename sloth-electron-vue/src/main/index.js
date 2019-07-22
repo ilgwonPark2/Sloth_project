@@ -217,7 +217,7 @@ setTimeout( () => {
    if (err) throw err;
    else console.log('tar tar');
   });
-}, 7000);
+}, 10000);
 event.sender.send('apply_design_reply', '');
 })
 
