@@ -29,18 +29,24 @@
     </b-card-group>
 
     <b-modal centered id="design-server-modal" title="Apply Design">
-      <div class="">
-        <b-container >
-          <b-row>
-            <b-table hover big :items="servers" :fields="fields">
+      <div>
+        <b-container>
+          <b-row class="justify-content-center" >
+            <b-table v-if="!apply_status" hover big :items="servers" :fields="fields">
               <template slot="server_apply" slot-scope="row">
                 <b-button size="md" class="fa fa-check-circle" @click="apply_design(row.item.server_name)"  aria-hidden="true">
                 </b-button>
               </template>
               <template slot="server_clear" slot-scope="row">
-                <b-button size="md" class="fa fa-trash"  @click="clear_design(row.item)" v-b-modal.design-server-modal pill aria-hidden="true"></b-button>
+                <b-button size="md" class="fa fa-trash" @click="clear_design(row.item)" v-b-modal.design-server-modal pill aria-hidden="true"></b-button>
               </template>
             </b-table>
+            <div v-else >
+              <h5>Applying the {{template}} template</h5><br>
+              <div class="d-flex justify-content-center mb-3" style="width:100%">
+                <b-spinner class="m-5" style="width: 3rem; height: 3rem;" variant="success" key="success" type="grow"></b-spinner>
+              </div>
+            </div>
           </b-row>
         </b-container>
       </div>
@@ -76,7 +82,8 @@ export default {
         server_apply: {label: 'Apply'},
         server_clear: {label: 'Clear'}
       },
-      template: ''
+      template: '',
+      apply_status: false
     }
   },
   mounted() {
@@ -90,7 +97,7 @@ export default {
       this.server_info(arg)
     });
     ipcRenderer.on('apply_design_reply', (event, arg) => {
-      alert('success to apply')
+      this.apply_status = false
     });
     ipcRenderer.on('clear_design_reply', (event, arg) => {
       alert('success to clear')
@@ -117,12 +124,12 @@ export default {
         item["server_control"] = false
         item["server_name"] = jsonFile.servers[i].server_name
         item["server_port"] = jsonFile.servers[i].server_port
-        jsonArr.push(item);
-        console.log(item)
+        jsonArr.push(item)
       }
       this.servers = jsonArr
     },
     apply_design(item){
+      this.apply_status = true
       ipcRenderer.send('apply_design', [this.template, item]);
     },
     clear_design(item){

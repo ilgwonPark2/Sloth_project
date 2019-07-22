@@ -215,10 +215,10 @@ setTimeout( () => {
   console.log(tar)
   child = exec(tar, function(err, stdout, stderr) {
    if (err) throw err;
-   else console.log('tar tar');
+   else console.log('tar');
   });
-}, 10000);
-event.sender.send('apply_design_reply', '');
+  event.sender.send('apply_design_reply', '');
+}, 8000);
 })
 
 
