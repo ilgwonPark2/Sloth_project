@@ -32,7 +32,7 @@
       <div>
         <b-container>
           <b-row class="justify-content-center" >
-            <b-table v-if="!apply_status" hover big :items="servers" :fields="fields">
+            <b-table v-if="!status_apply" hover big :items="servers" :fields="fields">
               <template slot="server_apply" slot-scope="row">
                 <b-button size="md" class="fa fa-check-circle" @click="apply_design(row.item.server_name)"  aria-hidden="true">
                 </b-button>
@@ -42,7 +42,8 @@
               </template>
             </b-table>
             <div v-else >
-              <h5>Applying the {{template}} template</h5><br>
+              <h5 v-if="is_apply"> Applying the {{template}} template </h5>
+              <h5 v-else> Clearing the applied template </h5><br>
               <div class="d-flex justify-content-center mb-3" style="width:100%">
                 <b-spinner class="m-5" style="width: 3rem; height: 3rem;" variant="success" key="success" type="grow"></b-spinner>
               </div>
@@ -83,7 +84,8 @@ export default {
         server_clear: {label: 'Clear'}
       },
       template: '',
-      apply_status: false
+      status_apply: false,
+      is_apply: false
     }
   },
   mounted() {
@@ -97,7 +99,7 @@ export default {
       this.server_info(arg)
     });
     ipcRenderer.on('apply_design_reply', (event, arg) => {
-      this.apply_status = false
+      this.status_apply = false
     });
     ipcRenderer.on('clear_design_reply', (event, arg) => {
       alert('success to clear')
@@ -129,14 +131,19 @@ export default {
       this.servers = jsonArr
     },
     apply_design(item){
-      this.apply_status = true
+      this.status_apply = true
+      this.is_apply = true
       ipcRenderer.send('apply_design', [this.template, item]);
     },
     clear_design(item){
-      // ipcRenderer.send('clear_design', [this.template, item]);
+      this.status_apply = true
+      this.is_apply = false
       ipcRenderer.send('server_remove', item.server_name)
       setTimeout(() => ipcRenderer.send('server_create', item), 3000)
-      setTimeout(() => ipcRenderer.send('server_start', item.server_name), 3000)
+      setTimeout(() => {
+        ipcRenderer.send('server_start', item.server_name)
+        this.status_apply = false
+    }, 3000)
 
     }
   }
