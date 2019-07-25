@@ -17,7 +17,7 @@
           </b-button>
         </template>
         <template slot="server_removal" slot-scope="row">
-          <b-button size="md" class="fa fa-trash" @click="item_remove = row.item;" v-b-modal.node-server-remove-modal pill aria-hidden="true"></b-button>
+          <b-button v-if="row.item.server_type==='Node'" size="md" class="fa fa-trash" @click="item_remove = row.item;" v-b-modal.node-server-remove-modal pill aria-hidden="true"></b-button>
         </template>
       </b-table>
     </b-row>
@@ -67,6 +67,7 @@ export default {
         server_control: { label: 'Start/Stop' },
         server_name: { label: 'Server' },
         server_port: { label: 'Port' },
+        server_type: { label: 'Type' },
         "performance.memory": { label: 'Memory' },
         "performance.cpu": { label: 'CPU'},
         "performance.size": { label: 'Size' },
@@ -117,10 +118,10 @@ export default {
       } catch (error) { console.log(error) }
 
       try {
-        console.log(s_port)
+        // console.log(s_port)
         stdout = execSync('lsof -iTCP:' + s_port);
         tmp_ids = String.fromCharCode.apply(null, stdout)
-        console.log(tmp_ids)
+        // console.log(tmp_ids)
       } catch (error) { console.log("error:  "  + error) }
 
       try{
@@ -152,11 +153,13 @@ export default {
       this.items = {}
       var jsonFile = file;
       var jsonArr = []
+      // Node Server push
       for (var i = 0; i < jsonFile.servers.length; i++) {
         var item = {}, perform = {}
         item["server_control"] = false
         item["server_name"] = jsonFile.servers[i].server_name
         item["server_port"] = jsonFile.servers[i].server_port
+        item["server_type"] = 'Node'
         perform = this.server_info_memory(item["server_name"], item["server_port"])
         item["performance"] = {
           memory: perform.memory,
@@ -165,10 +168,11 @@ export default {
         }
         jsonArr.push(item);
       }
+      jsonArr.push({"server_control": true, "server_name": "NPM GUI", "server_port": 1337, "server_type": "NPM GUI "})
+      jsonArr.push({"server_control": true, "server_name": "MySQL", "server_port": 3306, "server_type": "MySQL "})
+      jsonArr.push({"server_control": true, "server_name": "MySQL GUI", "server_port": 3000, "server_type": "MySQL GUI "})
       this.items = jsonArr
-      for (var i = 0; i < jsonFile.servers.length; i++) {
-        this.server_status_check(jsonFile.servers[i].server_port, i)
-      }
+      for (var i = 0; i < jsonFile.servers.length; i++) this.server_status_check(jsonFile.servers[i].server_port, i)
     },
     server_toggle(item) {
       var index = this.find_elem(item);
