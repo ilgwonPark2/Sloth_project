@@ -87,7 +87,7 @@ export default {
     // this.server_refresh()
     this.timer = this.server_refresh()
     ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
-    ipcRenderer.on('server_info_reply', (event, arg) => { this.server_info(arg) });
+    ipcRenderer.on('server_node_info_reply', (event, arg) => { this.server_node_info(arg) });
 
     // refresh timer
     setInterval(this.server_refresh, 25000);
@@ -96,7 +96,7 @@ export default {
     clearInterval(this.timer)
   },
   methods: {
-    server_info_memory(name, port) {
+    server_node_info_memory(name, port) {
       var s_name = name, s_port = port
       var base = './static/node_server/'
       var dir = require('path').join(__dirname, base)
@@ -107,7 +107,7 @@ export default {
       let pid_list = []
       let fileSize = '', fileArr = '', tmp_ids = '', tmp = '',
           pid = '', tmp_size='', stdout = ''
-      // alert("server_info_memory function")
+      // alert("server_node_info_memory function")
       const execSync = require('child_process').execSync
       try {
         stdout = execSync('du -hs ' + dir_exec + s_name);
@@ -149,7 +149,7 @@ export default {
       } catch (error) {}
       return info;
     },
-    server_info(file){
+    server_node_info(file){
       this.items = {}
       var jsonFile = file;
       var jsonArr = []
@@ -160,7 +160,7 @@ export default {
         item["server_name"] = jsonFile.servers[i].server_name
         item["server_port"] = jsonFile.servers[i].server_port
         item["server_type"] = 'Node'
-        perform = this.server_info_memory(item["server_name"], item["server_port"])
+        perform = this.server_node_info_memory(item["server_name"], item["server_port"])
         item["performance"] = {
           memory: perform.memory,
           cpu: perform.cpu + "%",
@@ -168,34 +168,53 @@ export default {
         }
         jsonArr.push(item);
       }
-      jsonArr.push({"server_control": true, "server_name": "NPM GUI", "server_port": 1337, "server_type": "NPM GUI "})
-      jsonArr.push({"server_control": true, "server_name": "MySQL", "server_port": 3306, "server_type": "MySQL "})
-      jsonArr.push({"server_control": true, "server_name": "MySQL GUI", "server_port": 3000, "server_type": "MySQL GUI "})
+      jsonArr.push({"server_control": true, "server_name": "NPM GUI", "server_port": 1337, "server_type": "NPM_GUI"})
+      jsonArr.push({"server_control": true, "server_name": "MySQL", "server_port": 3306, "server_type": "MySQL"})
+      jsonArr.push({"server_control": true, "server_name": "MySQL GUI", "server_port": 3000, "server_type": "MySQL_GUI"})
       this.items = jsonArr
       for (var i = 0; i < jsonFile.servers.length; i++) this.server_status_check(jsonFile.servers[i].server_port, i)
     },
     server_toggle(item) {
-      var index = this.find_elem(item);
-      if (this.items[index].server_control) ipcRenderer.send('server_stop', item.server_name);
-      else ipcRenderer.send('server_start', item.server_name);
-      this.items[index].server_control = !this.items[index].server_control;
-      setTimeout(() => { ipcRenderer.send('server_info') }, 500);
+      if (item.server_type === 'Node'){
+        var index = this.find_elem(item);
+        if (this.items[index].server_control) ipcRenderer.send('server_node_stop', item.server_name);
+        else ipcRenderer.send('server_node_start', item.server_name);
+        this.items[index].server_control = !this.items[index].server_control;
+        setTimeout(() => { this.server_refresh() }, 500);
+      } else {
+        switch (item.server_type) {
+          case 'NPM_GUI':
+
+            break;
+          case 'MySQL':
+
+            break;
+          case 'MySQL_GUI':
+
+            break;
+          default:
+
+        }
+      }
     },
     server_refresh(){
-      ipcRenderer.send('server_info')
+      ipcRenderer.send('server_node_info')
     },
-    server_create(item) {
-      ipcRenderer.send('server_create', item)
+    server_node_create(item) {
+      ipcRenderer.send('server_node_create', item)
       this.server_refresh()
     },
-    server_remove(item) {
+    server_node_remove(item) {
       if(item.server_control === true) this.server_toggle(item)
-      ipcRenderer.send('server_remove', item.server_name)
+      ipcRenderer.send('server_node_remove', item.server_name)
       this.server_refresh()
     },
     server_controlAll(status){
-      var param_toggle = (status === "start") ? 'server_start' : 'server_stop'
-      this.items.forEach(function(item, arr) { ipcRenderer.send( param_toggle, item.server_name) })
+      var param_toggle = (status === "start") ? 'server_node_start' : 'server_node_stop'
+      this.items.forEach(function(item, arr) {
+        if(item.server_type === 'Node') ipcRenderer.send( param_toggle, item.server_name)
+        else console.log('Non Node')
+      })
       setTimeout(() => { this.server_refresh() }, 500);
     },
     server_status_check(server_port, idx){
@@ -215,10 +234,10 @@ export default {
       evt.preventDefault();
       switch (evt.componentId) {
         case "node-server-create-modal":
-          this.server_create(this.form);
+          this.server_node_create(this.form);
           break;
         case "node-server-remove-modal":
-          this.server_remove(this.item_remove);
+          this.server_node_remove(this.item_remove);
           this.item_remove="";
           break;
         default:
@@ -234,13 +253,8 @@ export default {
       this.form.server_port = ''
       // Trick to reset/clear native browser form validation state
       this.show = false
-      this.$nextTick(() => {
-        this.show = true
-      })
+      this.$nextTick(() => this.show = true )
     }
   }
 }
 </script>
-
-<style lang="css">
-</style>

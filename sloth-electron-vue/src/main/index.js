@@ -17,7 +17,7 @@ const winURL = process.env.NODE_ENV === 'development' ?
   `http://localhost:9070` :
   `file://${__dirname}/index.html`
 
-function createWindow() {
+function create_window() {
   /**
    * Initial window options
    */
@@ -29,29 +29,15 @@ function createWindow() {
 
   mainWindow.loadURL(winURL)
 
-  mainWindow.on('closed', () => {
-    mainWindow = null
-    // stopNPM()
-  })
+  mainWindow.on('closed', () => mainWindow = null )
 }
 
 
-app.on('ready', createWindow)
-app.on('ready', startNPM)
-// app.on('ready', stopNpm)
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow()
-    // startNpm()
-  }
-})
+app.on('ready', create_window)
+app.on('ready', start_npm_gui)
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+app.on('will-quit', () => {stop_npm_gui()})
+app.on('activate', () => { if (mainWindow === null) create_window() })
 
 
 
@@ -65,12 +51,12 @@ app.on('activate', () => {
 
 
 
-ipcMain.on('server_info', (event, arg) => {
+ipcMain.on('server_node_info', (event, arg) => {
   var jsonFile = read_server_config()
-  event.sender.send('server_info_reply', jsonFile);
+  event.sender.send('server_node_info_reply', jsonFile);
 })
 
-ipcMain.on('server_start', (event, arg) => {
+ipcMain.on('server_node_start', (event, arg) => {
   var exec = require('child_process').exec, child;
   const s_name = arg
   var base = '/static/node_server/'
@@ -90,7 +76,7 @@ ipcMain.on('server_start', (event, arg) => {
   });
 })
 
-ipcMain.on('server_stop', (event, arg) => {
+ipcMain.on('server_node_stop', (event, arg) => {
   const io = require('socket.io-client');
   var jsonFile = read_server_config()
   const s_name = arg
@@ -110,7 +96,7 @@ ipcMain.on('server_stop', (event, arg) => {
 
 })
 
-ipcMain.on('server_create', (event, arg) => {
+ipcMain.on('server_node_create', (event, arg) => {
   var exec = require('child_process').exec, child;
   var d_name = arg.server_name
   var base = './static/node_server/'
@@ -138,7 +124,7 @@ ipcMain.on('server_create', (event, arg) => {
   event.returnValue = null
 })
 
-ipcMain.on('server_remove', (event, arg) => {
+ipcMain.on('server_node_remove', (event, arg) => {
   var exec = require("child_process").exec, child;
   var jsonFile = read_server_config()
   var d_name = arg
@@ -192,11 +178,11 @@ setTimeout( () => {
 })
 
 ipcMain.on('npm_start', (event, arg) => {
-  startNPM()
+  start_npm_gui()
 })
 
 ipcMain.on('npm_stop', (event, arg) =>{
-  stopNPM()
+  stop_npm_gui()
 })
 
 // ipcMain.on('stop_npm_gui', (event) => {
@@ -224,7 +210,7 @@ function read_server_config(){
 }
 
 
-function startNPM() {
+function start_npm_gui() {
   var exec = require("child_process").exec, child;
   var base = './node_modules/npm-gui/'
   var dir = require('path').join(__dirname, base)
@@ -237,23 +223,21 @@ function startNPM() {
   });
 }
 
-function stopNPM() {
+function stop_npm_gui() {
+  let fileSize = '', fileArr = '', stdout = ''
+  // alert("server_node_info_memory function")
+  const execSync = require('child_process').execSync
+  try {
+    stdout = execSync('ps -ef | grep npm-gui/index.js');
+    fileSize = stdout.toString().trim()
+    console.log('fileSzie: ' + fileSize)
+    var tmp_filesize = fileSize.split('/')
+    console.log('tmp_filesize: ' + tmp_filesize)
+    fileArr = tmp_filesize[0].split('  ')[1]
+    console.log('fileArr: ' + fileArr)
+  } catch (error) { console.log(error) }
 
+  try {
+    stdout = execSync('kill -9 ' + fileArr);
+  } catch (error) { console.log("error:  "  + error) }
 }
-
-
-// function stopNpm() {
-//   let fileSize = '', fileArr = '', stdout = ''
-//   // alert("server_info_memory function")
-//   const execSync = require('child_process').execSync
-//   try {
-//     stdout = execSync('ps -ef | grep index.js');
-//     fileSize = stdout.toString().trim()
-//     var tmp_filesize = fileSize.split('/')
-//     fileArr = tmp_filesize[0].split('  ')[1]
-//   } catch (error) { console.log(error) }
-
-//   try {
-//     stdout = execSync('kill -9 ' + fileArr);
-//   } catch (error) { console.log("error:  "  + error) }
-// }
