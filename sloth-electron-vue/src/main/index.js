@@ -185,16 +185,6 @@ ipcMain.on('npm_stop', (event, arg) =>{
   stop_npm_gui()
 })
 
-// ipcMain.on('stop_npm_gui', (event) => {
-//   const io = require('socket.io-client');
-
-//   const socketClient = io.connect('http://localhost:1337');
-//   socketClient.on('connect', () => {
-//     socketClient.emit('serverStop')
-//     socketClient.close()
-//   });
-// })
-
 
 
 
