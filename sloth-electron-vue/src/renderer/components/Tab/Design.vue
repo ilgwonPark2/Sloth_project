@@ -63,7 +63,8 @@
 
 <script>
 const {ipcRenderer} = require('electron')
-const axios = require('axios');
+const axios = require('axios')
+
 export default {
   data() {
     return {
@@ -91,11 +92,11 @@ export default {
   mounted() {
     setTimeout(() => {
       this.shown = true
-      ipcRenderer.send('server_info');
+      ipcRenderer.send('server_node_info');
     }, 1000)
 
     ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
-    ipcRenderer.on('server_info_reply', (event, arg) => {
+    ipcRenderer.on('server_node_info_reply', (event, arg) => {
       this.server_info(arg)
     });
     ipcRenderer.on('apply_design_reply', (event, arg) => {
@@ -128,6 +129,7 @@ export default {
         item["server_port"] = jsonFile.servers[i].server_port
         jsonArr.push(item)
       }
+      // console.log(jsonArr)
       this.servers = jsonArr
     },
     apply_design(item){
@@ -138,10 +140,10 @@ export default {
     clear_design(item){
       this.status_apply = true
       this.is_apply = false
-      ipcRenderer.send('server_remove', item.server_name)
-      setTimeout(() => ipcRenderer.send('server_create', item), 3000)
+      ipcRenderer.send('server_node_remove', item.server_name)
+      setTimeout(() => ipcRenderer.send('server_node_create', item), 3000)
       setTimeout(() => {
-        ipcRenderer.send('server_start', item.server_name)
+        ipcRenderer.send('server_node_start', item.server_name)
         this.status_apply = false
     }, 3000)
 
