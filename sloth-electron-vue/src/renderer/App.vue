@@ -9,10 +9,5 @@
 </template>
 
 <script>
-  export default {
-    name: 'sloth-electron-vue'
-  }
+  export default { name: 'sloth-electron-vue'}
 </script>
-<style>
-  /* CSS */
-</style>

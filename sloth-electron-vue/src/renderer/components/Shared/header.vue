@@ -19,10 +19,5 @@
 </template>
 
 <script>
-export default {
-  name: 'header',
-}
+export default {  name: 'sloth_header' }
 </script>
-
-<style lang="css">
-</style>

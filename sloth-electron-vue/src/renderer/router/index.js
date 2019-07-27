@@ -6,8 +6,8 @@ import Sloth_NPM from '@/components/Tab/NPM'
 import Sloth_Design from '@/components/Tab/Design'
 import Sloth_Server from '@/components/Tab/Server'
 import Sloth_Boiler from '@/components/Tab/Boiler'
-import Header from '@/components/Shared/header.vue'
-import Footer from '@/components/Shared/footer.vue'
+import Header from '@/components/Shared/Header.vue'
+import Footer from '@/components/Shared/Footer.vue'
 
 Vue.use(Router)
 
