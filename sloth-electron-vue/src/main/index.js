@@ -17,24 +17,11 @@ const winURL = process.env.NODE_ENV === 'development' ?
   `http://localhost:9070` :
   `file://${__dirname}/index.html`
 
-function create_window() {
-  /**
-   * Initial window options
-   */
-  mainWindow = new BrowserWindow({
-    height: 1200,
-    useContentSize: true,
-    width: 1400
-  })
-
-  mainWindow.loadURL(winURL)
-
-  mainWindow.on('closed', () => mainWindow = null )
-}
-
-
-app.on('ready', create_window)
-app.on('ready', start_npm_gui)
+app.on('ready', () => {
+  create_window()
+  start_npm_gui()
+  check_mysql()
+})
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 app.on('will-quit', () => {stop_npm_gui()})
 app.on('activate', () => { if (mainWindow === null) create_window() })
@@ -189,6 +176,19 @@ ipcMain.on('npm_stop', (event, arg) =>{
 
 
 
+
+function create_window() {
+  // Initial window options
+  mainWindow = new BrowserWindow({
+    height: 1200,
+    useContentSize: true,
+    width: 1400
+  })
+  mainWindow.loadURL(winURL)
+  mainWindow.on('closed', () => mainWindow = null )
+}
+
+
 function read_server_config(){
   var fs = require('fs');
   var base = './static/node_server/'
@@ -201,7 +201,7 @@ function read_server_config(){
 
 
 function start_npm_gui() {
-  var exec = require("child_process").exec, child;
+  var exec = require('child_process').exec, child;
   var base = './node_modules/npm-gui/'
   var dir = require('path').join(__dirname, base)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
@@ -230,4 +230,37 @@ function stop_npm_gui() {
   try {
     stdout = execSync('kill -9 ' + fileArr);
   } catch (error) { console.log("error:  "  + error) }
+}
+
+function check_mysql() {
+  var command = "test -e /tmp/mysql.sock && echo true || echo false"
+
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+    if (stdout !== null) event.sender.send('Error', stdout);
+    if (stderr !== null) event.sender.send('Error', stderr);
+    if (stdout === "false") {setup_mysql()}
+    // if (err !== null) console.log(err)
+    // if (stdout !== null) console.log(err)
+    // if (stderr !== null) console.log(err)
+
+  });
+}
+
+function setup_mysql() {
+  var exec = require('child_process').exec, child
+  var dir = require('path').join(__dirname)
+  var command = (process.env.NODE_ENV === 'development') ?
+    require('path').resolve(dir)+"/mysql/scripts/mysql_install_db":
+    "/../../../../../../mysql/scripts/mysql_install_db "
+
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+    if (stdout !== null) event.sender.send('Error', stdout);
+    if (stderr !== null) event.sender.send('Error', stderr);
+    // if (err !== null) console.log(err)
+    // if (stdout !== null) console.log(err)
+    // if (stderr !== null) console.log(err)
+  });
+}
 }
