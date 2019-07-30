@@ -263,4 +263,37 @@ function setup_mysql() {
     // if (stderr !== null) console.log(err)
   });
 }
+
+function start_mysql() {
+  var exec = require('child_process').exec, child
+  var dir = require('path').join(__dirname)
+  var command = (process.env.NODE_ENV === 'development') ?
+    require('path').resolve(dir)+"/mysql/bin/mysqld_safe &":
+    "/../../../../../../mysql/bin/mysqld_safe & "
+
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+    if (stdout !== null) event.sender.send('Error', stdout);
+    if (stderr !== null) event.sender.send('Error', stderr);
+    // if (err !== null) console.log(err)
+    // if (stdout !== null) console.log(err)
+    // if (stderr !== null) console.log(err)
+  });
+}
+
+function stop_mysql() {
+  var exec = require('child_process').exec, child
+  var dir = require('path').join(__dirname)
+  var command = (process.env.NODE_ENV === 'development') ?
+    require('path').resolve(dir)+"/mysql/bin/mysqladmin -u root shutdown":
+    "/../../../../../../mysql/bin/mysqladmin -u root shutdown"
+
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) event.sender.send('Error', err);
+    if (stdout !== null) event.sender.send('Error', stdout);
+    if (stderr !== null) event.sender.send('Error', stderr);
+    // if (err !== null) console.log(err)
+    // if (stdout !== null) console.log(err)
+    // if (stderr !== null) console.log(err)
+  });
 }
