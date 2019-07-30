@@ -46,7 +46,7 @@ ipcMain.on('server_node_info', (event, arg) => {
 ipcMain.on('server_node_start', (event, arg) => {
   var exec = require('child_process').exec, child;
   const s_name = arg
-  var base = '/static/node_server/'
+  var base = './static/node_server/'
   var dir = require('path').join(__dirname)
   var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
   var command = (process.env.NODE_ENV === 'development') ?
@@ -85,12 +85,10 @@ ipcMain.on('server_node_stop', (event, arg) => {
 
 ipcMain.on('server_node_create', (event, arg) => {
   var exec = require('child_process').exec, child;
-  var d_name = arg.server_name
-  var base = './static/node_server/'
-  var dir = require('path').join(__dirname, base)
-  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
-  var jsonFile = read_server_config()
-  var fs = require('fs');
+  const d_name = arg.server_name
+  const dir_exec = get_path()
+  const jsonFile = read_server_config()
+  const fs = require('fs')
 
   child = exec("mkdir " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
@@ -113,12 +111,10 @@ ipcMain.on('server_node_create', (event, arg) => {
 
 ipcMain.on('server_node_remove', (event, arg) => {
   var exec = require("child_process").exec, child;
-  var jsonFile = read_server_config()
-  var d_name = arg
-  var base = './static/node_server/'
-  var dir = require('path').join(__dirname, base)
-  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
-  var fs = require('fs');
+  const jsonFile = read_server_config()
+  const d_name = arg
+  const dir_exec = get_path()
+  const fs = require('fs');
 
   child = exec("rm -rf " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
@@ -134,12 +130,10 @@ ipcMain.on('server_node_remove', (event, arg) => {
 
 ipcMain.on('apply_design', (event, arg) => {
   var wget = require('wget')
-  var exec = require('child_process').exec, child;
-  var d_name = arg[1]
-  var base = './static/node_server/'
-  var dir = require('path').join(__dirname, base)
-  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
-  var DOWNLOAD_DIR = "https://templated.co/" + arg[0] + "/download"
+  const exec = require('child_process').exec, child;
+  const d_name = arg[1]
+  const dir_exec = get_path()
+  const var DOWNLOAD_DIR = "https://templated.co/" + arg[0] + "/download"
 
   var output = dir_exec + d_name + "/template.tar.gz"
   var options = {};
@@ -189,16 +183,20 @@ function create_window() {
 }
 
 
-function read_server_config(){
-  var fs = require('fs');
-  var base = './static/node_server/'
-  var dir = require('path').join(__dirname, base)
-  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+function read_server_config() {
+  var fs = require('fs')
+  const dir_exec = get_path()
   var jsonFile = fs.readFileSync(dir_exec + 'server_config.json');
   jsonFile = JSON.parse(jsonFile)
   return jsonFile
 }
 
+function get_path() {
+  var base = './static/node_server/'
+  var dir = require('path').join(__dirname)
+  var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
+  return dir_exec
+}
 
 function start_npm_gui() {
   var exec = require('child_process').exec, child;
