@@ -233,16 +233,22 @@ function stop_npm_gui() {
 }
 
 function check_mysql() {
+  var exec = require('child_process').exec, child
   var command = "test -e /tmp/mysql.sock && echo true || echo false"
 
   child = exec(command, function(err, stdout, stderr) {
-    if (err !== null) event.sender.send('Error', err);
-    if (stdout !== null) event.sender.send('Error', stdout);
-    if (stderr !== null) event.sender.send('Error', stderr);
-    if (stdout === "false") {setup_mysql()}
-    // if (err !== null) console.log(err)
-    // if (stdout !== null) console.log(err)
-    // if (stderr !== null) console.log(err)
+    // if (err !== null) event.sender.send('Error', err);
+    // if (stdout !== null) event.sender.send('Error', stdout);
+    // if (stderr !== null) event.sender.send('Error', stderr);
+    if (stdout === "false") {
+      setup_mysql()
+      console.log('no sql')
+    } else {
+      console.log('yes sql')
+    }
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
 
   });
 }
@@ -255,12 +261,12 @@ function setup_mysql() {
     "/../../../../../../mysql/scripts/mysql_install_db "
 
   child = exec(command, function(err, stdout, stderr) {
-    if (err !== null) event.sender.send('Error', err);
-    if (stdout !== null) event.sender.send('Error', stdout);
-    if (stderr !== null) event.sender.send('Error', stderr);
-    // if (err !== null) console.log(err)
-    // if (stdout !== null) console.log(err)
-    // if (stderr !== null) console.log(err)
+    // if (err !== null) event.sender.send('Error', err);
+    // if (stdout !== null) event.sender.send('Error', stdout);
+    // if (stderr !== null) event.sender.send('Error', stderr);
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
   });
 }
 
@@ -272,12 +278,12 @@ function start_mysql() {
     "/../../../../../../mysql/bin/mysqld_safe & "
 
   child = exec(command, function(err, stdout, stderr) {
-    if (err !== null) event.sender.send('Error', err);
-    if (stdout !== null) event.sender.send('Error', stdout);
-    if (stderr !== null) event.sender.send('Error', stderr);
-    // if (err !== null) console.log(err)
-    // if (stdout !== null) console.log(err)
-    // if (stderr !== null) console.log(err)
+    // if (err !== null) event.sender.send('Error', err);
+    // if (stdout !== null) event.sender.send('Error', stdout);
+    // if (stderr !== null) event.sender.send('Error', stderr);
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
   });
 }
 
@@ -289,11 +295,11 @@ function stop_mysql() {
     "/../../../../../../mysql/bin/mysqladmin -u root shutdown"
 
   child = exec(command, function(err, stdout, stderr) {
-    if (err !== null) event.sender.send('Error', err);
-    if (stdout !== null) event.sender.send('Error', stdout);
-    if (stderr !== null) event.sender.send('Error', stderr);
-    // if (err !== null) console.log(err)
-    // if (stdout !== null) console.log(err)
-    // if (stderr !== null) console.log(err)
+    // if (err !== null) event.sender.send('Error', err);
+    // if (stdout !== null) event.sender.send('Error', stdout);
+    // if (stderr !== null) event.sender.send('Error', stderr);
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
   });
 }
