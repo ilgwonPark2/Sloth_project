@@ -168,9 +168,7 @@ export default {
         }
         jsonArr.push(item);
       }
-      jsonArr.push({"server_control": true, "server_name": "NPM GUI", "server_port": 1337, "server_type": "NPM_GUI"})
       jsonArr.push({"server_control": true, "server_name": "MySQL", "server_port": 3306, "server_type": "MySQL"})
-      jsonArr.push({"server_control": true, "server_name": "MySQL GUI", "server_port": 3000, "server_type": "MySQL_GUI"})
       this.items = jsonArr
       for (var i = 0; i < jsonFile.servers.length; i++) this.server_status_check(jsonFile.servers[i].server_port, i)
     },
