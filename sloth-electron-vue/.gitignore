@@ -4,6 +4,7 @@ dist/web/*
 build/*
 !build/icons
 node_modules
+static/node_server
 !static/node_server/node_template/node_modules
 npm-debug.log
 npm-debug.log.*
