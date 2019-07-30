@@ -19,6 +19,9 @@
         <template slot="server_removal" slot-scope="row">
           <b-button v-if="row.item.server_type==='Node'" size="md" class="fa fa-trash" @click="item_remove = row.item;" v-b-modal.node-server-remove-modal pill aria-hidden="true"></b-button>
         </template>
+        <template slot="server_directory" slot-scope="row">
+          <b-button v-if="row.item.server_type==='Node'" size="md" class="fa fa-file" pill v-b-tooltip.hover :title="row.item.server_directory" @click="server_open_directory(row.item.server_directory)"></b-button>
+        </template>
       </b-table>
     </b-row>
   </b-container>
@@ -54,7 +57,7 @@
 </template>
 
 <script>
-const {ipcRenderer} = require('electron')
+const {ipcRenderer, shell} = require('electron')
 const axios = require('axios');
 
 
@@ -71,6 +74,7 @@ export default {
         "performance.memory": { label: 'Memory' },
         "performance.cpu": { label: 'CPU'},
         "performance.size": { label: 'Size' },
+        server_directory: {label: 'File'},
         server_removal: {label: 'Remove'}
       },
       items: [],
@@ -96,6 +100,9 @@ export default {
     clearInterval(this.timer)
   },
   methods: {
+    server_open_directory(path){
+      shell.showItemInFolder(path)
+    },
     server_node_info_memory(name, port) {
       var s_name = name, s_port = port
       var base = './static/node_server/'
@@ -153,6 +160,9 @@ export default {
       this.items = {}
       var jsonFile = file;
       var jsonArr = []
+      var base = './static/node_server/'
+      var dir = require('path').join(__dirname, base)
+      var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
       // Node Server push
       for (var i = 0; i < jsonFile.servers.length; i++) {
         var item = {}, perform = {}
@@ -166,6 +176,7 @@ export default {
           cpu: perform.cpu + "%",
           size: perform.size
         }
+        item["server_directory"] = require('path').resolve(dir_exec) + "/" + item["server_name"]
         jsonArr.push(item);
       }
       jsonArr.push({"server_control": true, "server_name": "MySQL", "server_port": 3306, "server_type": "MySQL"})
@@ -180,19 +191,6 @@ export default {
         this.items[index].server_control = !this.items[index].server_control;
         setTimeout(() => { this.server_refresh() }, 500);
       } else {
-        switch (item.server_type) {
-          case 'NPM_GUI':
-
-            break;
-          case 'MySQL':
-
-            break;
-          case 'MySQL_GUI':
-
-            break;
-          default:
-
-        }
       }
     },
     server_refresh(){
