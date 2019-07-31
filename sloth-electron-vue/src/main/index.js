@@ -165,24 +165,26 @@ ipcMain.on('npm_start', (event, arg) => { start_npm_gui() })
 
 ipcMain.on('npm_stop', (event, arg) => { stop_npm_gui() })
 
-ipcMain.on('mysql_status', (event, arg) => {
-  var exec = require('child_process').exec, child
-  var dir = require('path').join(__dirname)
-  var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root processlist":
-    "/../../../../../../mysql/bin/mysqladmin -u root processlist"
-  child = exec(command, function(err, stdout, stderr) {
-    if (err !== null) console.log(err)
-    if (stdout !== null) console.log(err)
-    if (stderr !== null) console.log(err)
-    var result = stdout.includes("error: 'Can't connect to local MySQL server through socket '/tmp/mysql.sock'")
-    event.sender.send('mysql_status_reply', !result);
-  });
+ipcMain.on('server_mysql_status', (event, arg) => {
+  const execSync = require('child_process').execSync
+  var result
+  try {
+    var parm = execSync("lsof -i:3306")
+    event.sender.send('server_mysql_status_reply', true);
+  } catch(err){
+    console.log('no server detected')
+    event.sender.send('server_mysql_status_reply', false);
+  }
 })
 
-ipcMain.on('mysql_start', (event, arg) =>{ mysql_start() })
+ipcMain.on('server_mysql_start', (event, arg) =>{
+  console.log('server_mysql_start');
+  mysql_start();
+})
 
-ipcMain.on('mysql_stop', (event, arg) =>{ mysql_stop() })
+ipcMain.on('server_mysql_stop', (event, arg) =>{
+  console.log('server_mysql_stop');
+  mysql_stop(); })
 
 
 
@@ -270,7 +272,7 @@ function mysql_setup() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir)+"/../../build/mac/mysql/scripts/mysql_install_db":
+    require('path').resolve(dir) + "/../../build/mac/mysql/scripts/mysql_install_db":
     "/../../../../../../mysql/scripts/mysql_install_db "
 
   child = exec(command, function(err, stdout, stderr) {
@@ -286,17 +288,19 @@ function mysql_setup() {
 function mysql_start() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
+  console.log('in the fucntion mysql_start')
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir)+"/../../build/mac/mysql/bin/mysqld_safe &":
-    "/../../../../../../mysql/bin/mysqld_safe & "
+    "cd "+require('path').resolve(dir) + "/../../build/mac/mysql ; ./bin/mysqld_safe":
+    "cd /../../../../../../mysql/mysql ; ./bin/mysqld_safe"
 
   child = exec(command, function(err, stdout, stderr) {
     // if (err !== null) event.sender.send('Error', err);
     // if (stdout !== null) event.sender.send('Error', stdout);
     // if (stderr !== null) event.sender.send('Error', stderr);
     if (err !== null) console.log(err)
-    if (stdout !== null) console.log(err)
-    if (stderr !== null) console.log(err)
+    if (stdout !== null) console.log(stdout)
+    if (stderr !== null) console.log(stderr)
+
   });
 }
 
@@ -304,7 +308,7 @@ function mysql_stop() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir)+"/../../build/mac/mysql/bin/mysqladmin -u root shutdown":
+    require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root shutdown":
     "/../../../../../../mysql/bin/mysqladmin -u root shutdown"
 
   child = exec(command, function(err, stdout, stderr) {
@@ -318,19 +322,19 @@ function mysql_stop() {
 }
 
 function mysql_status() {
-  var result
+  var result = true
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root processlist":
-    "/../../../../../../mysql/bin/mysqladmin -u root processlist"
+    "echo `" + require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root processlist`":
+    "echo `/../../../../../../mysql/bin/mysqladmin -u root processlist`"
   child = exec(command, function(err, stdout, stderr) {
-    if (err !== null) console.log(err)
-    if (stdout !== null) console.log(err)
-    if (stderr !== null) console.log(err)
+    if (err !== null) console.log("err: " + err)
+    if (stdout !== null) console.log("stdout: " + stdout)
+    if (stderr !== null) console.log("stderr: " + stderr)
     console.log(stdout)
-    if (stdout.includes("error: 'Can't connect to local MySQL server through socket '/tmp/mysql.sock'")) result = false
-    else result = true
+    // if (stdout.includes("error: 'Can't connect to local MySQL server through socket '/tmp/mysql.sock'")) result = false
+    // else result = true
     console.log('stdout includes: ' +  result)
   });
   console.log('before return from mysql_status()')

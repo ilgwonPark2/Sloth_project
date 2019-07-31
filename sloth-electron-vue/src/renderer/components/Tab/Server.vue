@@ -94,7 +94,7 @@ export default {
   mounted: function() {
     this.timer = this.server_refresh()
     ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) })
-    ipcRenderer.on('mysql_status_reply', (event, arg) => {
+    ipcRenderer.on('server_mysql_status_reply', (event, arg) => {
       this.items[this.items.length-1].server_control = arg;
       this.status_mysql= arg })
     ipcRenderer.on('server_node_info_reply', (event, arg) => { this.server_node_info(arg) })
@@ -197,12 +197,14 @@ export default {
         if (this.items[index].server_control) ipcRenderer.send('server_node_stop', item.server_name);
         else ipcRenderer.send('server_node_start', item.server_name);
         this.items[index].server_control = !this.items[index].server_control;
-        setTimeout(() => { this.server_refresh() }, 500);
       } else {
+        if (this.status_mysql) ipcRenderer.send('server_mysql_stop')
+        else ipcRenderer.send('server_mysql_start')
       }
+      setTimeout(() => { this.server_refresh() }, 500);
     },
     server_refresh(){
-      ipcRenderer.send('mysql_status')
+      ipcRenderer.send('server_mysql_status')
       ipcRenderer.send('server_node_info')
     },
     server_node_create(item) {
