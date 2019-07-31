@@ -20,10 +20,13 @@ const winURL = process.env.NODE_ENV === 'development' ?
 app.on('ready', () => {
   create_window()
   start_npm_gui()
-  check_mysql()
+  mysql_check()
+  // console.log("test22: " + mysql_status())
 })
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
-app.on('will-quit', () => {stop_npm_gui()})
+app.on('will-quit', () => {
+   stop_npm_gui()
+ })
 app.on('activate', () => { if (mainWindow === null) create_window() })
 
 
@@ -44,9 +47,9 @@ ipcMain.on('server_node_info', (event, arg) => {
 })
 
 ipcMain.on('server_node_start', (event, arg) => {
-  var exec = require('child_process').exec, child;
+  var exec = require('child_process').exec, child
   const s_name = arg
-  var base = './static/node_server/'
+  var base = '/static/node_server/'
   var dir = require('path').join(__dirname)
   var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
   var command = (process.env.NODE_ENV === 'development') ?
@@ -84,7 +87,7 @@ ipcMain.on('server_node_stop', (event, arg) => {
 })
 
 ipcMain.on('server_node_create', (event, arg) => {
-  var exec = require('child_process').exec, child;
+  var exec = require('child_process').exec, child
   const d_name = arg.server_name
   const dir_exec = get_path()
   const jsonFile = read_server_config()
@@ -93,7 +96,7 @@ ipcMain.on('server_node_create', (event, arg) => {
   child = exec("mkdir " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
   });
-  child = exec("cp " + dir_exec + "node_template/* " + dir_exec + d_name, function(err, stdout, stderr) {
+  child = exec("cp -r " + dir_exec + "node_template/* " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
   });
 
@@ -110,7 +113,7 @@ ipcMain.on('server_node_create', (event, arg) => {
 })
 
 ipcMain.on('server_node_remove', (event, arg) => {
-  var exec = require("child_process").exec, child;
+  var exec = require("child_process").exec, child
   const jsonFile = read_server_config()
   const d_name = arg
   const dir_exec = get_path()
@@ -130,10 +133,10 @@ ipcMain.on('server_node_remove', (event, arg) => {
 
 ipcMain.on('apply_design', (event, arg) => {
   var wget = require('wget')
-  const exec = require('child_process').exec, child;
-  const d_name = arg[1]
-  const dir_exec = get_path()
-  const var DOWNLOAD_DIR = "https://templated.co/" + arg[0] + "/download"
+  var d_name = arg[1]
+  var exec = require('child_process').exec, child
+  var dir_exec = get_path()
+  var DOWNLOAD_DIR = "https://templated.co/" + arg[0] + "/download"
 
   var output = dir_exec + d_name + "/template.tar.gz"
   var options = {};
@@ -154,17 +157,32 @@ setTimeout( () => {
    if (err) throw err;
    else console.log('tar');
   });
-  event.sender.send('apply_design_reply', '');
+  event.sender.send('apply_design_reply', '')
 }, 8000);
 })
 
-ipcMain.on('npm_start', (event, arg) => {
-  start_npm_gui()
+ipcMain.on('npm_start', (event, arg) => { start_npm_gui() })
+
+ipcMain.on('npm_stop', (event, arg) => { stop_npm_gui() })
+
+ipcMain.on('mysql_status', (event, arg) => {
+  var exec = require('child_process').exec, child
+  var dir = require('path').join(__dirname)
+  var command = (process.env.NODE_ENV === 'development') ?
+    require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root processlist":
+    "/../../../../../../mysql/bin/mysqladmin -u root processlist"
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
+    var result = stdout.includes("error: 'Can't connect to local MySQL server through socket '/tmp/mysql.sock'")
+    event.sender.send('mysql_status_reply', !result);
+  });
 })
 
-ipcMain.on('npm_stop', (event, arg) =>{
-  stop_npm_gui()
-})
+ipcMain.on('mysql_start', (event, arg) =>{ mysql_start() })
+
+ipcMain.on('mysql_stop', (event, arg) =>{ mysql_stop() })
 
 
 
@@ -199,7 +217,7 @@ function get_path() {
 }
 
 function start_npm_gui() {
-  var exec = require('child_process').exec, child;
+  var exec = require('child_process').exec, child
   var base = './node_modules/npm-gui/'
   var dir = require('path').join(__dirname, base)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
@@ -230,32 +248,29 @@ function stop_npm_gui() {
   } catch (error) { console.log("error:  "  + error) }
 }
 
-function check_mysql() {
+function mysql_check() {
   var exec = require('child_process').exec, child
   var command = "test -e /tmp/mysql.sock && echo true || echo false"
-
+  var result
   child = exec(command, function(err, stdout, stderr) {
-    // if (err !== null) event.sender.send('Error', err);
-    // if (stdout !== null) event.sender.send('Error', stdout);
-    // if (stderr !== null) event.sender.send('Error', stderr);
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
+    if(stdout === false) console.log(result)
     if (stdout === "false") {
       setup_mysql()
       console.log('no sql')
     } else {
       console.log('yes sql')
     }
-    if (err !== null) console.log(err)
-    if (stdout !== null) console.log(err)
-    if (stderr !== null) console.log(err)
-
   });
 }
 
-function setup_mysql() {
+function mysql_setup() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir)+"/mysql/scripts/mysql_install_db":
+    require('path').resolve(dir)+"/../../build/mac/mysql/scripts/mysql_install_db":
     "/../../../../../../mysql/scripts/mysql_install_db "
 
   child = exec(command, function(err, stdout, stderr) {
@@ -268,11 +283,11 @@ function setup_mysql() {
   });
 }
 
-function start_mysql() {
+function mysql_start() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir)+"/mysql/bin/mysqld_safe &":
+    require('path').resolve(dir)+"/../../build/mac/mysql/bin/mysqld_safe &":
     "/../../../../../../mysql/bin/mysqld_safe & "
 
   child = exec(command, function(err, stdout, stderr) {
@@ -285,11 +300,11 @@ function start_mysql() {
   });
 }
 
-function stop_mysql() {
+function mysql_stop() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir)+"/mysql/bin/mysqladmin -u root shutdown":
+    require('path').resolve(dir)+"/../../build/mac/mysql/bin/mysqladmin -u root shutdown":
     "/../../../../../../mysql/bin/mysqladmin -u root shutdown"
 
   child = exec(command, function(err, stdout, stderr) {
@@ -300,4 +315,24 @@ function stop_mysql() {
     if (stdout !== null) console.log(err)
     if (stderr !== null) console.log(err)
   });
+}
+
+function mysql_status() {
+  var result
+  var exec = require('child_process').exec, child
+  var dir = require('path').join(__dirname)
+  var command = (process.env.NODE_ENV === 'development') ?
+    require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root processlist":
+    "/../../../../../../mysql/bin/mysqladmin -u root processlist"
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) console.log(err)
+    if (stdout !== null) console.log(err)
+    if (stderr !== null) console.log(err)
+    console.log(stdout)
+    if (stdout.includes("error: 'Can't connect to local MySQL server through socket '/tmp/mysql.sock'")) result = false
+    else result = true
+    console.log('stdout includes: ' +  result)
+  });
+  console.log('before return from mysql_status()')
+  return result
 }

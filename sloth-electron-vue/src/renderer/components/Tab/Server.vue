@@ -84,14 +84,20 @@ export default {
       },
       item_remove: '',
       show: true,
-      timer: ''
+      timer: '',
+      status_mysql: false
     }
   },
+  created: function() {
+    ipcRenderer.send('server_node_info')
+  },
   mounted: function() {
-    // this.server_refresh()
     this.timer = this.server_refresh()
-    ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
-    ipcRenderer.on('server_node_info_reply', (event, arg) => { this.server_node_info(arg) });
+    ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) })
+    ipcRenderer.on('mysql_status_reply', (event, arg) => {
+      this.items[this.items.length-1].server_control = arg;
+      this.status_mysql= arg })
+    ipcRenderer.on('server_node_info_reply', (event, arg) => { this.server_node_info(arg) })
 
     // refresh timer
     setInterval(this.server_refresh, 25000);
@@ -177,9 +183,11 @@ export default {
           size: perform.size
         }
         item["server_directory"] = require('path').resolve(dir_exec) + "/" + item["server_name"]
-        jsonArr.push(item);
+        jsonArr.push(item)
+        console.log(item)
       }
-      jsonArr.push({"server_control": true, "server_name": "MySQL", "server_port": 3306, "server_type": "MySQL"})
+      jsonArr.push({"server_control": this.status_mysql, "server_name": "MySQL", "server_port": 3306, "server_type": "MySQL"})
+      // console.log('put mysql')
       this.items = jsonArr
       for (var i = 0; i < jsonFile.servers.length; i++) this.server_status_check(jsonFile.servers[i].server_port, i)
     },
@@ -194,6 +202,7 @@ export default {
       }
     },
     server_refresh(){
+      ipcRenderer.send('mysql_status')
       ipcRenderer.send('server_node_info')
     },
     server_node_create(item) {
