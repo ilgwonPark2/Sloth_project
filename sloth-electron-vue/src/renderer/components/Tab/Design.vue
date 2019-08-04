@@ -7,7 +7,7 @@
         class="overflow-hidden col-md-6"
         v-for="item in paginated('items')"
         img-alt="Image"
-        style="max-width: 620px;">
+        style="max-width: 620px;" v-bind:key="item">
           <b-row no-gutters>
             <b-col sm="7">
               <b-card-img :src="'https://templated.co/items/thumbnails/'+item + '.jpg'" class="rounded-0"></b-card-img>

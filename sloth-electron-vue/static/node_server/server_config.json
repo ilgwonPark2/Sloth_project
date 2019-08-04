@@ -1,3 +1,9 @@
 {
-	"servers": []
+	"servers": [
+		{
+			"server_name": "sj",
+			"server_address": "localhost",
+			"server_port": 1234
+		}
+	]
 }
