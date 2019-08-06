@@ -93,10 +93,10 @@ ipcMain.on('server_node_create', (event, arg) => {
   const jsonFile = read_server_config()
   const fs = require('fs')
 
-  child = exec("mkdir " + dir_exec + d_name, function(err, stdout, stderr) {
+  child = exec("mkdir " + dir_exec + '/'+ d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
   });
-  child = exec("cp -r " + dir_exec + "node_template/* " + dir_exec + d_name, function(err, stdout, stderr) {
+  child = exec("cp -r " + dir_exec + "/node_template/* " + dir_exec +'/'+ d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
   });
 
@@ -108,7 +108,7 @@ ipcMain.on('server_node_create', (event, arg) => {
 
   obj['servers'] = jsonFile.servers
   var json_str = JSON.stringify(obj, null, "\t")
-  fs.writeFileSync(dir_exec + 'server_config.json', json_str, function(err) { if (err) throw err; });
+  fs.writeFileSync(dir_exec + '/server_config.json', json_str, function(err) { if (err) throw err; });
   event.returnValue = null
 })
 
@@ -161,7 +161,7 @@ setTimeout( () => {
 }, 8000);
 })
 
-ipcMain.on('npm_start', (event, arg) => { start_npm_gui() })
+// ipcMain.on('npm_start', (event, arg) => { start_npm_gui() })
 
 ipcMain.on('npm_stop', (event, arg) => { stop_npm_gui() })
 
@@ -206,28 +206,40 @@ function create_window() {
 function read_server_config() {
   var fs = require('fs')
   const dir_exec = get_path()
-  var jsonFile = fs.readFileSync(dir_exec + 'server_config.json');
+  var jsonFile = fs.readFileSync(dir_exec + '/server_config.json');
   jsonFile = JSON.parse(jsonFile)
   return jsonFile
 }
 
 function get_path() {
   var base = './static/node_server/'
-  var dir = require('path').join(__dirname, base)
-  var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
+  var dir = require('path').join(__dirname)
+  var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir + '/static/node_server'
   return dir_exec
 }
 
-function start_npm_gui() {
+function start_npm_gui(event, arg) {
   var exec = require('child_process').exec, child
   var base = './node_modules/npm-gui/'
-  var dir = require('path').join(__dirname, base)
+  var dir = require('path').join(__dirname)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
   var d_name = "index.js"
-  console.log(dir_exec);
+  var dir_value = ''
+  console.log('start/ build: '+dir+'/node_modules/npm-gui/')
+  console.log('start/ dev: '+ dir_exec)
+  // alert(dir_exec + d_name)
 
-  child = exec("node " + dir_exec + d_name, function(err, stdout, stderr) {
-    if (err !== null) console.log('Error', err);
+
+  var command = (process.env.NODE_ENV === 'development') ?
+  "node " + dir_exec + d_name :
+  dir_exec + "/../../../../../../nodejs/bin/node "  + dir_exec + '/../../node_modules/npm-gui/' + d_name
+  console.log('command/ build: '+ command)
+  console.log('command/ dev: '+ dir + "/../../../../../../nodejs/bin/node "  + dir + '/../../node_modules/npm-gui/' + d_name )
+
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) {
+      console.log(err)
+    }
   });
 }
 

@@ -5,8 +5,17 @@
 </template>
 
 <script>
+const {ipcRenderer} = require('electron')
+
 export default {
-  name: 'menu-npm'
+  name: 'menu-npm',
+  data() {
+    return {
+    }
+  },
+  mounted: function(){
+    ipcRenderer.on('npm-gui-reply', (event, arg) => { alert(JSON.stringify(arg)) })
+  }
 }
 </script>
 
