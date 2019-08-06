@@ -93,10 +93,10 @@ ipcMain.on('server_node_create', (event, arg) => {
   const jsonFile = read_server_config()
   const fs = require('fs')
 
-  child = exec("mkdir " + dir_exec + '/'+ d_name, function(err, stdout, stderr) {
+  child = exec("mkdir " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
   });
-  child = exec("cp -r " + dir_exec + "/node_template/* " + dir_exec +'/'+ d_name, function(err, stdout, stderr) {
+  child = exec("cp -r " + dir_exec + "node_template/* " + dir_exec + d_name, function(err, stdout, stderr) {
     if (err !== null) event.sender.send('Error', err);
   });
 
@@ -108,7 +108,7 @@ ipcMain.on('server_node_create', (event, arg) => {
 
   obj['servers'] = jsonFile.servers
   var json_str = JSON.stringify(obj, null, "\t")
-  fs.writeFileSync(dir_exec + '/server_config.json', json_str, function(err) { if (err) throw err; });
+  fs.writeFileSync(dir_exec + 'server_config.json', json_str, function(err) { if (err) throw err; });
   event.returnValue = null
 })
 
@@ -206,15 +206,15 @@ function create_window() {
 function read_server_config() {
   var fs = require('fs')
   const dir_exec = get_path()
-  var jsonFile = fs.readFileSync(dir_exec + '/server_config.json');
+  var jsonFile = fs.readFileSync(dir_exec + 'server_config.json');
   jsonFile = JSON.parse(jsonFile)
   return jsonFile
 }
 
 function get_path() {
   var base = './static/node_server/'
-  var dir = require('path').join(__dirname)
-  var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir + '/static/node_server'
+  var dir = require('path').join(__dirname, base)
+  var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
   return dir_exec
 }
 
