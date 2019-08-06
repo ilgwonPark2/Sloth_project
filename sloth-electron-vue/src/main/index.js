@@ -213,7 +213,7 @@ function read_server_config() {
 
 function get_path() {
   var base = './static/node_server/'
-  var dir = require('path').join(__dirname)
+  var dir = require('path').join(__dirname, base)
   var dir_exec = (process.env.NODE_ENV === 'development') ? base : dir
   return dir_exec
 }
