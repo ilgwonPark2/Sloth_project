@@ -20,12 +20,14 @@ const winURL = process.env.NODE_ENV === 'development' ?
 app.on('ready', () => {
   create_window()
   start_npm_gui()
+  start_mysql_gui()
   mysql_check()
   // console.log("test22: " + mysql_status())
 })
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 app.on('will-quit', () => {
    stop_npm_gui()
+   stop_mysql_gui()
  })
 app.on('activate', () => { if (mainWindow === null) create_window() })
 
@@ -225,17 +227,14 @@ function start_npm_gui(event, arg) {
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
   var d_name = "index.js"
   var dir_value = ''
-  console.log('start/ build: '+dir+'/node_modules/npm-gui/')
-  console.log('start/ dev: '+ dir_exec)
-  // alert(dir_exec + d_name)
-
+  // console.log('start/ build: '+dir+'/node_modules/npm-gui/')
+  // console.log('start/ dev: '+ dir_exec)
 
   var command = (process.env.NODE_ENV === 'development') ?
   "node " + dir_exec + d_name :
   dir_exec + "/../../../../../../nodejs/bin/node "  + dir_exec + '/../../node_modules/npm-gui/' + d_name
-  console.log('command/ build: '+ command)
-  console.log('command/ dev: '+ dir + "/../../../../../../nodejs/bin/node "  + dir + '/../../node_modules/npm-gui/' + d_name )
-
+  // console.log('command/ build: '+ command)
+  // console.log('command/ dev: '+ dir + "/../../../../../../nodejs/bin/node "  + dir + '/../../node_modules/npm-gui/' + d_name )
   child = exec(command, function(err, stdout, stderr) {
     if (err !== null) {
       console.log(err)
@@ -249,6 +248,47 @@ function stop_npm_gui() {
   const execSync = require('child_process').execSync
   try {
     stdout = execSync('ps -ef | grep npm-gui/index.js');
+    fileSize = stdout.toString().trim()
+    console.log('fileSzie: ' + fileSize)
+    var tmp_filesize = fileSize.split('/')
+    console.log('tmp_filesize: ' + tmp_filesize)
+    fileArr = tmp_filesize[0].split('  ')[1]
+    console.log('fileArr: ' + fileArr)
+  } catch (error) { console.log(error) }
+
+  try {
+    stdout = execSync('kill -9 ' + fileArr);
+  } catch (error) { console.log("error:  "  + error) }
+}
+
+function start_mysql_gui(event, arg) {
+  var exec = require('child_process').exec, child
+  var base = './node_modules/nodeadmin/'
+  var dir = require('path').join(__dirname)
+  var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
+  var d_name = "app.js"
+  var dir_value = ''
+  console.log('start/ build: ' + dir + '/node_modules/nodeadmin/')
+  console.log('start/ dev: '+ dir_exec)
+
+  var command = (process.env.NODE_ENV === 'development') ?
+  "node " + dir_exec + d_name :
+  dir_exec + "/../../../../../../nodejs/bin/node "  + dir_exec + '/../../node_modules/nodeadmin/' + d_name
+  console.log('command/ build: '+ command)
+  console.log('command/ dev: '+ dir + "/../../../../../../nodejs/bin/node "  + dir + '/../../node_modules/nodeadmin/' + d_name )
+  child = exec(command, function(err, stdout, stderr) {
+    if (err !== null) {
+      console.log(err)
+    }
+  });
+}
+
+function stop_mysql_gui() {
+  let fileSize = '', fileArr = '', stdout = ''
+  // alert("server_node_info_memory function")
+  const execSync = require('child_process').execSync
+  try {
+    stdout = execSync('ps -ef | grep nodeadmin/app.js');
     fileSize = stdout.toString().trim()
     console.log('fileSzie: ' + fileSize)
     var tmp_filesize = fileSize.split('/')
