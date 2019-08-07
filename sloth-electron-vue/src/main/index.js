@@ -22,7 +22,6 @@ app.on('ready', () => {
   start_npm_gui()
   start_mysql_gui()
   mysql_check()
-  // console.log("test22: " + mysql_status())
 })
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 app.on('will-quit', () => {
@@ -186,7 +185,8 @@ ipcMain.on('server_mysql_start', (event, arg) =>{
 
 ipcMain.on('server_mysql_stop', (event, arg) =>{
   console.log('server_mysql_stop');
-  mysql_stop(); })
+  mysql_stop();
+})
 
 
 
@@ -267,15 +267,14 @@ function start_mysql_gui(event, arg) {
   var dir = require('path').join(__dirname)
   var dir_exec = process.env.NODE_ENV === 'development' ? base : dir
   var d_name = "app.js"
-  var dir_value = ''
   console.log('start/ build: ' + dir + '/node_modules/nodeadmin/')
   console.log('start/ dev: '+ dir_exec)
 
   var command = (process.env.NODE_ENV === 'development') ?
   "node " + dir_exec + d_name :
   dir_exec + "/../../../../../../nodejs/bin/node "  + dir_exec + '/../../node_modules/nodeadmin/' + d_name
-  console.log('command/ build: '+ command)
-  console.log('command/ dev: '+ dir + "/../../../../../../nodejs/bin/node "  + dir + '/../../node_modules/nodeadmin/' + d_name )
+  // console.log('command/ build: '+ command)
+  // console.log('command/ dev: '+ dir + "/../../../../../../nodejs/bin/node "  + dir + '/../../node_modules/nodeadmin/' + d_name )
   child = exec(command, function(err, stdout, stderr) {
     if (err !== null) {
       console.log(err)
@@ -344,7 +343,7 @@ function mysql_start() {
   var dir = require('path').join(__dirname)
   console.log('in the fucntion mysql_start')
   var command = (process.env.NODE_ENV === 'development') ?
-    "cd "+require('path').resolve(dir) + "/../../build/mac/mysql ; ./bin/mysqld_safe":
+    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql; ./bin/mysqld_safe":
     "cd " + dir + "/../../../../../../mysql; ./bin/mysqld_safe"
 
   child = exec(command, function(err, stdout, stderr) {
@@ -362,7 +361,7 @@ function mysql_stop() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root shutdown":
+    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql; ./bin/mysqladmin -u root shutdown":
     "cd " + dir + "/../../../../../../mysql; ./bin/mysqladmin -u root shutdown"
 
   child = exec(command, function(err, stdout, stderr) {
