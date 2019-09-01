@@ -1,15 +1,19 @@
 <template>
 <div class="footer" >
-
-        <b-row class="text-center" style="background:#D8D8D8; height:55px">
-            <b-col style="font: monosapce; color:#2E2E2E; font-size:1.1em">© 2019 Capstone Design</b-col>
-            <b-col cols="6">
-                <a href="#" class="alert-link" style="font-family: monosapce; color:#70AE47; font-size:1.8em" @click="test()">
-                Donate us!</a>
-            </b-col>
-            <b-col style="font: monosapce; color:#2E2E2E; font-size:1.1em"> Created by jihae, ilkwon</b-col>
-        </b-row>
-
+    <b-row class="text-center" style="background:#D8D8D8; height:64px">
+        <b-col cols="3" style="padding-top:5px;">
+            <b-img src="./static/image/author3.png" alt="jihae&ilgwon" style="height:90%;"></b-img>
+        </b-col>
+        <b-col cols="6" style="padding-top:5px;">
+            <a style="font-weight:400; color:#424242; font-size:1.0em; margin-top:20px;">
+            © 2019 Capstone Design<br>
+            Built with all the love in ITM, SeoulTech. </a>
+        </b-col>
+        <b-col cols="3" style="padding-top:13px;" > 
+            <b-img src="./static/image/github.svg" alt="sloth" style="height:80%;"></b-img>
+            <a href="https://github.com/ilgwonPark2/Sloth_project" style="font-weight:600; color:#2E2E2E; font-size:1.2em; ">GitHub</a>
+        </b-col>
+    </b-row>
 
 </div>
 
