@@ -9,7 +9,7 @@
  Feel free to use Sloth, contribute for people!!
  
  
-## *OS Support
+## OS Support
 **Build TESTED**
 
 - MacOSX: Sierra ~ Mojave.
