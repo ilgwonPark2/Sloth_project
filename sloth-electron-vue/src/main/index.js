@@ -342,7 +342,10 @@ function mysql_setup() {
     // if (stdout !== null) event.sender.send('Error', stdout);
     // if (stderr !== null) event.sender.send('Error', stderr);
     if (err !== null) console.log(err)
-    if (stdout !== null) console.log(err)
+    if (stdout !== null) {
+      console.log(err)
+      mysql_start()
+    }
     if (stderr !== null) console.log(err)
   });
 }
