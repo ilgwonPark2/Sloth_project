@@ -11,7 +11,7 @@
         </b-col>
         <b-col cols="3" style="padding-top:13px;" > 
             <b-img src="./static/image/github.svg" alt="sloth" style="height:80%;"></b-img>
-            <a href="https://github.com/ilgwonPark2/Sloth_project" style="font-weight:600; color:#2E2E2E; font-size:1.2em; ">GitHub</a>
+            <a href="https://github.com/ilgwonPark2/Sloth_project" target="_blank" style="font-weight:600; color:#2E2E2E; font-size:1.2em; ">GitHub</a>
         </b-col>
     </b-row>
 
@@ -22,5 +22,8 @@
 </template>
 
 <script>
-export default {name: 'sloth_footer'}
+export default {
+    name: 'sloth_footer'
+}
+
 </script>
