@@ -8,14 +8,21 @@
  
  Feel free to use Sloth, contribute for people!!
  
+ 
+## Enhancement Plan
+**OS Support**
+
+- MacOSX: (Tested) Sierra ~ Mojave.
+- Ubuntu: (Tetesd) 16.04 LTS.
+
 
 
 ## Enhancement Plan
-
 This project has a enhancement plan.
 
 - Database: Add mongoDB server (Compatibility with Node JS is good).
 - Code Editor: Code Editor for who do not install editor.
+- Packaging: Include nodejs, MySQL in the Sloth.app
 
 
 ## Requirements
