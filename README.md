@@ -9,11 +9,11 @@
  Feel free to use Sloth, contribute for people!!
  
  
-## Enhancement Plan
-**OS Support**
+## *OS Support
+**Build TESTED**
 
-- MacOSX: (Tested) Sierra ~ Mojave.
-- Ubuntu: (Tetesd) 16.04 LTS.
+- MacOSX: Sierra ~ Mojave.
+- Ubuntu: 16.04 LTS.
 
 
 
