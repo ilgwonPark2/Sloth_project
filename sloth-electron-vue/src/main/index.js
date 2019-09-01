@@ -142,24 +142,33 @@ ipcMain.on('apply_design', (event, arg) => {
   var output = dir_exec + d_name + "/template.tar.gz"
   var options = {};
   var download = wget.download(DOWNLOAD_DIR, output, options);
-  download.on('error', function(err) {
-      console.log(err);
-  });
-  download.on('end', function(output) {
-      console.log(output);
-  });
-  download.on('progress', function(progress) {
-  });
-
-setTimeout( () => {
-  var tar = 'cd '+ dir_exec + d_name +' && tar -xvzf ./template.tar.gz && rm -rf ./template.tar.gz'
-  console.log(tar)
-  child = exec(tar, function(err, stdout, stderr) {
-   if (err) throw err;
-   else console.log('tar');
-  });
-  event.sender.send('apply_design_reply', '')
-}, 8000);
+  new Promise(function(resolve, reject){
+    download.on('error', function(err) {
+        console.log(err);
+        reject();
+    });
+    download.on('end', function(output) {
+        console.log(output);
+        resolve();
+    });
+  }).then(() => {
+    var tar = 'cd '+ dir_exec + d_name +'&& tar -xvzf ./template.tar.gz'
+    console.log(tar)
+    child = exec(tar, function(err, stdout, stderr) {
+     if (err) throw err;
+     else console.log('tar');
+    });
+  }).then(() => {
+    var tar = 'cd '+ dir_exec + d_name +'&& rm -rf ./template.tar.gz'
+    console.log(tar)
+    child = exec(tar, function(err, stdout, stderr) {
+     if (err) throw err;
+     else console.log('tar');
+    });
+    event.sender.send('apply_design_reply', '')
+  }).catch(() => {
+    event.sender.send('Error', 'Please click the apply button again')
+  })
 })
 
 // ipcMain.on('npm_start', (event, arg) => { start_npm_gui() })

@@ -94,7 +94,7 @@ export default {
       ipcRenderer.send('server_node_info');
     }, 1000)
 
-    ipcRenderer.on('Error', (event, arg) => { alert(JSON.stringify(arg)) });
+    ipcRenderer.on('Error', (event, arg) => { alert(arg) });
     ipcRenderer.on('server_node_info_reply', (event, arg) => {
       this.server_info(arg)
     });
