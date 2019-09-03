@@ -10,7 +10,7 @@
 
 ## Getting started
 ```
-npm install
+cd sloth-electron-vue && npm install
 ```
 
  
