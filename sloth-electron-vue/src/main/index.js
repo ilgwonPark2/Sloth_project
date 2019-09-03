@@ -152,14 +152,14 @@ ipcMain.on('apply_design', (event, arg) => {
         resolve();
     });
   }).then(() => {
-    var tar = 'cd '+ dir_exec + d_name +'&& tar -xvzf ./template.tar.gz'
+    var tar = 'cd '+ dir_exec + d_name +'; tar -xvzf ./template.tar.gz'
     console.log(tar)
     child = exec(tar, function(err, stdout, stderr) {
      if (err) throw err;
      else console.log('tar');
     });
   }).then(() => {
-    var tar = 'cd '+ dir_exec + d_name +'&& rm -rf ./template.tar.gz'
+    var tar = 'cd '+ dir_exec + d_name +'; rm -rf ./template.tar.gz'
     console.log(tar)
     child = exec(tar, function(err, stdout, stderr) {
      if (err) throw err;
@@ -312,7 +312,7 @@ function stop_mysql_gui() {
 
 function mysql_check() {
   var exec = require('child_process').exec, child
-  var command = "test -e /tmp/mysql.sock && echo true || echo false"
+  var command = "test -e /tmp/mysql.sock; echo true || echo false"
   var result
   child = exec(command, function(err, stdout, stderr) {
     if (err !== null) console.log(err)
