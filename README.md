@@ -7,7 +7,12 @@
  Our project is open source GNU APGL Ver 3.0
  
  Feel free to use Sloth, contribute for people!!
- 
+
+## Getting started
+```
+npm install
+```
+
  
 ## OS Support
 **Build TESTED**
@@ -23,6 +28,7 @@ This project has a enhancement plan.
 - Database: Add mongoDB server (Compatibility with Node JS is good).
 - Code Editor: Code Editor for who do not install editor.
 - Packaging: Include nodejs, MySQL in the Sloth.app
+
 
 
 ## Requirements
