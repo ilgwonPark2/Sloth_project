@@ -152,14 +152,14 @@ ipcMain.on('apply_design', (event, arg) => {
         resolve();
     });
   }).then(() => {
-    var tar = 'cd '+ dir_exec + d_name +'; tar -xvzf ./template.tar.gz'
+    var tar = 'cd '+ dir_exec + d_name +' && tar -xvzf ./template.tar.gz'
     console.log(tar)
     child = exec(tar, function(err, stdout, stderr) {
      if (err) throw err;
      else console.log('tar');
     });
   }).then(() => {
-    var tar = 'cd '+ dir_exec + d_name +'; rm -rf ./template.tar.gz'
+    var tar = 'cd '+ dir_exec + d_name +' && rm -rf ./template.tar.gz'
     console.log(tar)
     child = exec(tar, function(err, stdout, stderr) {
      if (err) throw err;
@@ -312,7 +312,7 @@ function stop_mysql_gui() {
 
 function mysql_check() {
   var exec = require('child_process').exec, child
-  var command = "test -e /tmp/mysql.sock; echo true || echo false"
+  var command = "test -e /tmp/mysql.sock && echo true || echo false"
   var result
   child = exec(command, function(err, stdout, stderr) {
     if (err !== null) console.log(err)
@@ -334,8 +334,8 @@ function mysql_setup() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql; ./scripts/mysql_install_db":
-    "cd " + dir + "/../../../../../../mysql; ./scripts/mysql_install_db "
+    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql && ./scripts/mysql_install_db":
+    "cd " + dir + "/../../../../../../mysql && ./scripts/mysql_install_db "
 
   child = exec(command, function(err, stdout, stderr) {
     // if (err !== null) event.sender.send('Error', err);
@@ -355,8 +355,8 @@ function mysql_start() {
   var dir = require('path').join(__dirname)
   console.log('in the fucntion mysql_start')
   var command = (process.env.NODE_ENV === 'development') ?
-    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql; ./bin/mysqld_safe":
-    "cd " + dir + "/../../../../../../mysql; ./bin/mysqld_safe"
+    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql && ./bin/mysqld_safe":
+    "cd " + dir + "/../../../../../../mysql && ./bin/mysqld_safe"
 
   child = exec(command, function(err, stdout, stderr) {
     // if (err !== null) event.sender.send('Error', err);
@@ -373,8 +373,8 @@ function mysql_stop() {
   var exec = require('child_process').exec, child
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
-    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql; ./bin/mysqladmin -u root shutdown":
-    "cd " + dir + "/../../../../../../mysql; ./bin/mysqladmin -u root shutdown"
+    "cd " + require('path').resolve(dir) + "/../../build/mac/mysql && ./bin/mysqladmin -u root shutdown":
+    "cd " + dir + "/../../../../../../mysql && ./bin/mysqladmin -u root shutdown"
 
   child = exec(command, function(err, stdout, stderr) {
     // if (err !== null) event.sender.send('Error', err);
@@ -392,7 +392,7 @@ function mysql_status() {
   var dir = require('path').join(__dirname)
   var command = (process.env.NODE_ENV === 'development') ?
     "echo `" + require('path').resolve(dir) + "/../../build/mac/mysql/bin/mysqladmin -u root processlist`":
-    "echo `cd "+ dir + "/../../../../../../mysql; ./bin/mysqladmin -u root processlist`"
+    "echo `cd "+ dir + "/../../../../../../mysql && ./bin/mysqladmin -u root processlist`"
   child = exec(command, function(err, stdout, stderr) {
     if (err !== null) console.log("err: " + err)
     if (stdout !== null) console.log("stdout: " + stdout)
