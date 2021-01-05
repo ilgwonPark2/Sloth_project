@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@octokit/rest": "^16.28.7",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.20",
     "github-api": "^3.2.2",
